@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExternalDataService_StoreExternalData_FullMethodName = "/taomics.praman.externaldata.ExternalDataService/StoreExternalData"
+	ExternalDataService_StoreExternalData_FullMethodName      = "/taomics.praman.externaldata.ExternalDataService/StoreExternalData"
+	ExternalDataService_GetExternalDataSummary_FullMethodName = "/taomics.praman.externaldata.ExternalDataService/GetExternalDataSummary"
 )
 
 // ExternalDataServiceClient is the client API for ExternalDataService service.
@@ -29,6 +30,7 @@ const (
 // # ExternalDataservice
 //
 // Common Errors:
+//   - PERMISSION_DENIED (7): User has no permission to access the resource.
 //   - INTERNAL (13): Server is something wrong.
 //   - UNAUTHENTICATED (16): Authorization header is something wrong.
 type ExternalDataServiceClient interface {
@@ -37,6 +39,10 @@ type ExternalDataServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	StoreExternalData(ctx context.Context, in *StoreExternalDataRequest, opts ...grpc.CallOption) (*StoreExternalDataResponse, error)
+	// Get external data summary.
+	// Errors:
+	//   - NOT_FOUND (5): Specified source is not found.
+	GetExternalDataSummary(ctx context.Context, in *ExternalDataSummaryRequest, opts ...grpc.CallOption) (*ExternalDataSummaryResponse, error)
 }
 
 type externalDataServiceClient struct {
@@ -57,6 +63,16 @@ func (c *externalDataServiceClient) StoreExternalData(ctx context.Context, in *S
 	return out, nil
 }
 
+func (c *externalDataServiceClient) GetExternalDataSummary(ctx context.Context, in *ExternalDataSummaryRequest, opts ...grpc.CallOption) (*ExternalDataSummaryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExternalDataSummaryResponse)
+	err := c.cc.Invoke(ctx, ExternalDataService_GetExternalDataSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ExternalDataServiceServer is the server API for ExternalDataService service.
 // All implementations must embed UnimplementedExternalDataServiceServer
 // for forward compatibility.
@@ -64,6 +80,7 @@ func (c *externalDataServiceClient) StoreExternalData(ctx context.Context, in *S
 // # ExternalDataservice
 //
 // Common Errors:
+//   - PERMISSION_DENIED (7): User has no permission to access the resource.
 //   - INTERNAL (13): Server is something wrong.
 //   - UNAUTHENTICATED (16): Authorization header is something wrong.
 type ExternalDataServiceServer interface {
@@ -72,6 +89,10 @@ type ExternalDataServiceServer interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	StoreExternalData(context.Context, *StoreExternalDataRequest) (*StoreExternalDataResponse, error)
+	// Get external data summary.
+	// Errors:
+	//   - NOT_FOUND (5): Specified source is not found.
+	GetExternalDataSummary(context.Context, *ExternalDataSummaryRequest) (*ExternalDataSummaryResponse, error)
 	mustEmbedUnimplementedExternalDataServiceServer()
 }
 
@@ -84,6 +105,9 @@ type UnimplementedExternalDataServiceServer struct{}
 
 func (UnimplementedExternalDataServiceServer) StoreExternalData(context.Context, *StoreExternalDataRequest) (*StoreExternalDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StoreExternalData not implemented")
+}
+func (UnimplementedExternalDataServiceServer) GetExternalDataSummary(context.Context, *ExternalDataSummaryRequest) (*ExternalDataSummaryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExternalDataSummary not implemented")
 }
 func (UnimplementedExternalDataServiceServer) mustEmbedUnimplementedExternalDataServiceServer() {}
 func (UnimplementedExternalDataServiceServer) testEmbeddedByValue()                             {}
@@ -124,6 +148,24 @@ func _ExternalDataService_StoreExternalData_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExternalDataService_GetExternalDataSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExternalDataSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalDataServiceServer).GetExternalDataSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExternalDataService_GetExternalDataSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalDataServiceServer).GetExternalDataSummary(ctx, req.(*ExternalDataSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ExternalDataService_ServiceDesc is the grpc.ServiceDesc for ExternalDataService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +176,10 @@ var ExternalDataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StoreExternalData",
 			Handler:    _ExternalDataService_StoreExternalData_Handler,
+		},
+		{
+			MethodName: "GetExternalDataSummary",
+			Handler:    _ExternalDataService_GetExternalDataSummary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
