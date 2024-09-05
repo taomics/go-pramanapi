@@ -36,6 +36,7 @@ protoc: tmp/pramanapi tools
 	$(PROTOC) tmp/pramanapi/lifestylejournal/*.proto
 	$(PROTOC) tmp/pramanapi/recordlog/*.proto
 	$(PROTOC) tmp/pramanapi/externaldata/*.proto
+	$(PROTOC) tmp/pramanapi/healthcheck/*.proto
 	go mod init $(PROTO_GO_PKG); go mod tidy
 
 tmp/pramanapi: tmp/pramanapi.zip
