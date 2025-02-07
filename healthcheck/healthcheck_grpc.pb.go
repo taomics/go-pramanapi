@@ -35,11 +35,16 @@ const (
 //   - PERMISSION_DENIED (7): The requester does not have a permission.
 type HealthCheckServiceClient interface {
 	// Predict health check result in the future.
+	//
+	// Errors:
+	//   - NOT_FOUND (5): The health check data is not found.
 	PredictHealthCheck(ctx context.Context, in *HealthCheckPredictionRequest, opts ...grpc.CallOption) (*HealthCheckPredictionResponse, error)
 	// Upload health check result.
 	//
 	// Errors:
 	//   - INVALID_ARGUMENT (3): The upload data is invalid.
+	//   - FAILED_PRECONDITION (9): The upload data is not acceptable.
+	//   - ALREADY_EXISTS (6): The health check data is already exists.
 	UploadHealthCheckResult(ctx context.Context, in *UploadHealthCheckResultRequest, opts ...grpc.CallOption) (*UploadHealthCheckResultResponse, error)
 }
 
@@ -83,11 +88,16 @@ func (c *healthCheckServiceClient) UploadHealthCheckResult(ctx context.Context, 
 //   - PERMISSION_DENIED (7): The requester does not have a permission.
 type HealthCheckServiceServer interface {
 	// Predict health check result in the future.
+	//
+	// Errors:
+	//   - NOT_FOUND (5): The health check data is not found.
 	PredictHealthCheck(context.Context, *HealthCheckPredictionRequest) (*HealthCheckPredictionResponse, error)
 	// Upload health check result.
 	//
 	// Errors:
 	//   - INVALID_ARGUMENT (3): The upload data is invalid.
+	//   - FAILED_PRECONDITION (9): The upload data is not acceptable.
+	//   - ALREADY_EXISTS (6): The health check data is already exists.
 	UploadHealthCheckResult(context.Context, *UploadHealthCheckResultRequest) (*UploadHealthCheckResultResponse, error)
 	mustEmbedUnimplementedHealthCheckServiceServer()
 }
