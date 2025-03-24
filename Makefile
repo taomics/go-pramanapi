@@ -1,6 +1,6 @@
 PROTO_GO_PKG := github.com/taomics/pramanapi
 PROTO_OUT := .
-VERSION := 0.20250207.1
+VERSION := 0.20250324.0
 API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/v$(VERSION).zip
 GO_TEST :=
 
@@ -38,6 +38,7 @@ protoc: tmp/pramanapi tools
 	$(PROTOC) tmp/pramanapi/recordlog/*.proto
 	$(PROTOC) tmp/pramanapi/externaldata/*.proto
 	$(PROTOC) tmp/pramanapi/healthcheck/*.proto
+	$(PROTOC) tmp/pramanapi/healthfeedback/*.proto
 	go mod init $(PROTO_GO_PKG); go mod tidy
 
 tmp/pramanapi: tmp/pramanapi.zip
