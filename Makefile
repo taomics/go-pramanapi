@@ -1,7 +1,8 @@
 PROTO_GO_PKG := github.com/taomics/pramanapi
 PROTO_OUT := .
 VERSION := 0.20250406.0
-API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/v$(VERSION).zip
+TAG := v$(VERSION)
+API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/$(TAG).zip
 GO_TEST :=
 
 .PHONY: all
@@ -43,7 +44,7 @@ protoc: tmp/pramanapi tools
 
 tmp/pramanapi: tmp/pramanapi.zip
 	cd tmp; unzip pramanapi.zip
-	cd tmp; mv pramanapi-$(VERSION) pramanapi
+	cd tmp; mv pramanapi-* pramanapi
 	touch tmp/pramanapi
 
 tmp/pramanapi.zip:
