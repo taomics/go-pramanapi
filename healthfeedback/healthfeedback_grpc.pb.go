@@ -58,13 +58,13 @@ type HealthFeedbackServiceClient interface {
 	// GetWeeklyProgress
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no progress.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyProgress(ctx context.Context, in *GetWeeklyProgressRequest, opts ...grpc.CallOption) (*GetWeeklyProgressResponse, error)
 	// GetWeeklyReport
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no report.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyReport(ctx context.Context, in *GetWeeklyReportRequest, opts ...grpc.CallOption) (*GetWeeklyReportResponse, error)
 	// RateWeeklyReport
@@ -172,13 +172,13 @@ type HealthFeedbackServiceServer interface {
 	// GetWeeklyProgress
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no progress.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyProgress(context.Context, *GetWeeklyProgressRequest) (*GetWeeklyProgressResponse, error)
 	// GetWeeklyReport
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no report.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyReport(context.Context, *GetWeeklyReportRequest) (*GetWeeklyReportResponse, error)
 	// RateWeeklyReport

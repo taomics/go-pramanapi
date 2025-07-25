@@ -76,13 +76,13 @@ type HealthFeedbackServiceClient interface {
 	// GetWeeklyProgress
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no progress.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyProgress(context.Context, *connect.Request[healthfeedback.GetWeeklyProgressRequest]) (*connect.Response[healthfeedback.GetWeeklyProgressResponse], error)
 	// GetWeeklyReport
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no report.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyReport(context.Context, *connect.Request[healthfeedback.GetWeeklyReportRequest]) (*connect.Response[healthfeedback.GetWeeklyReportResponse], error)
 	// RateWeeklyReport
@@ -205,13 +205,13 @@ type HealthFeedbackServiceHandler interface {
 	// GetWeeklyProgress
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no progress.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyProgress(context.Context, *connect.Request[healthfeedback.GetWeeklyProgressRequest]) (*connect.Response[healthfeedback.GetWeeklyProgressResponse], error)
 	// GetWeeklyReport
 	//
 	// Errors:
-	//   - NOT_FOUND (5): there is no feedback.
+	//   - NOT_FOUND (5): there is no report.
 	//   - FAILED_PRECONDITION (9): health mode is not set.
 	GetWeeklyReport(context.Context, *connect.Request[healthfeedback.GetWeeklyReportRequest]) (*connect.Response[healthfeedback.GetWeeklyReportResponse], error)
 	// RateWeeklyReport
