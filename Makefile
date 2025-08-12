@@ -32,7 +32,7 @@ PROTOC := protoc \
 					--go-grpc_out=$(PROTO_OUT) --go-grpc_opt=paths=source_relative \
 					--connect-go_out=$(PROTO_OUT) --connect-go_opt=paths=source_relative
 
-protoc: tmp/pramanapi tools
+protoc: # tmp/pramanapi tools
 	$(PROTOC) tmp/pramanapi/*.proto
 	$(PROTOC) tmp/pramanapi/accounts/*.proto
 	$(PROTOC) tmp/pramanapi/lifestylejournal/*.proto
