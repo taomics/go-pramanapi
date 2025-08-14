@@ -1155,7 +1155,7 @@ var file_accounts_accounts_proto_rawDesc = []byte{
 	0x54, 0x49, 0x4f, 0x4e, 0x53, 0x10, 0x02, 0x12, 0x1d, 0x0a, 0x19, 0x4c, 0x49, 0x46, 0x45, 0x53,
 	0x54, 0x59, 0x4c, 0x45, 0x5f, 0x4a, 0x4f, 0x55, 0x52, 0x4e, 0x41, 0x4c, 0x5f, 0x53, 0x55, 0x4d,
 	0x4d, 0x41, 0x52, 0x59, 0x10, 0x03, 0x12, 0x11, 0x0a, 0x0d, 0x48, 0x45, 0x41, 0x4c, 0x54, 0x48,
-	0x5f, 0x41, 0x44, 0x56, 0x49, 0x43, 0x45, 0x10, 0x04, 0x32, 0x81, 0x08, 0x0a, 0x0f, 0x41, 0x63,
+	0x5f, 0x41, 0x44, 0x56, 0x49, 0x43, 0x45, 0x10, 0x04, 0x32, 0xc1, 0x08, 0x0a, 0x0f, 0x41, 0x63,
 	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x58, 0x0a,
 	0x0b, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x55, 0x73, 0x65, 0x72, 0x12, 0x15, 0x2e, 0x74,
 	0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x45, 0x6d,
@@ -1177,7 +1177,11 @@ var file_accounts_accounts_proto_rawDesc = []byte{
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x33, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73,
 	0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73,
 	0x2e, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73, 0x55, 0x73, 0x65, 0x72, 0x55, 0x70, 0x64,
-	0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5e, 0x0a, 0x0e, 0x43,
+	0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x0e, 0x44,
+	0x69, 0x73, 0x61, 0x62, 0x6c, 0x65, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x15, 0x2e,
+	0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x1a, 0x15, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70,
+	0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x12, 0x5e, 0x0a, 0x0e, 0x43,
 	0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x41, 0x64, 0x76, 0x69, 0x73, 0x6f, 0x72, 0x12, 0x15, 0x2e,
 	0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x45,
 	0x6d, 0x70, 0x74, 0x79, 0x1a, 0x35, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70,
@@ -1284,21 +1288,23 @@ var file_accounts_accounts_proto_depIdxs = []int32{
 	22, // 16: taomics.praman.accounts.AccountsService.CurrentUser:input_type -> taomics.praman.Empty
 	3,  // 17: taomics.praman.accounts.AccountsService.RegisterUser:input_type -> taomics.praman.accounts.AccountsUserCreationRequest
 	5,  // 18: taomics.praman.accounts.AccountsService.UpdateUser:input_type -> taomics.praman.accounts.AccountsUserUpdateRequest
-	22, // 19: taomics.praman.accounts.AccountsService.CurrentAdvisor:input_type -> taomics.praman.Empty
-	9,  // 20: taomics.praman.accounts.AccountsService.UpdateAdvisor:input_type -> taomics.praman.accounts.AccountsAdvisorUpdateRequest
-	12, // 21: taomics.praman.accounts.AccountsService.CreateAuthorization:input_type -> taomics.praman.accounts.AccountsAuthorizationCreationRequest
-	14, // 22: taomics.praman.accounts.AccountsService.RetrieveAuthorization:input_type -> taomics.praman.accounts.AccountsAuthorizationRetrievalRequest
-	16, // 23: taomics.praman.accounts.AccountsService.GrantAuthorization:input_type -> taomics.praman.accounts.AccountsAuthorizationGrantRequest
-	2,  // 24: taomics.praman.accounts.AccountsService.CurrentUser:output_type -> taomics.praman.accounts.AccountsUserFetchResponse
-	4,  // 25: taomics.praman.accounts.AccountsService.RegisterUser:output_type -> taomics.praman.accounts.AccountsUserCreationResponse
-	6,  // 26: taomics.praman.accounts.AccountsService.UpdateUser:output_type -> taomics.praman.accounts.AccountsUserUpdateResponse
-	8,  // 27: taomics.praman.accounts.AccountsService.CurrentAdvisor:output_type -> taomics.praman.accounts.AccountsAdvisorFetchResponse
-	10, // 28: taomics.praman.accounts.AccountsService.UpdateAdvisor:output_type -> taomics.praman.accounts.AccountsAdvisorUpdateResponse
-	13, // 29: taomics.praman.accounts.AccountsService.CreateAuthorization:output_type -> taomics.praman.accounts.AccountsAuthorizationCreationResponse
-	15, // 30: taomics.praman.accounts.AccountsService.RetrieveAuthorization:output_type -> taomics.praman.accounts.AccountsAuthorizationRetrievalResponse
-	17, // 31: taomics.praman.accounts.AccountsService.GrantAuthorization:output_type -> taomics.praman.accounts.AccountsAuthorizationGrantResponse
-	24, // [24:32] is the sub-list for method output_type
-	16, // [16:24] is the sub-list for method input_type
+	22, // 19: taomics.praman.accounts.AccountsService.DisableAccount:input_type -> taomics.praman.Empty
+	22, // 20: taomics.praman.accounts.AccountsService.CurrentAdvisor:input_type -> taomics.praman.Empty
+	9,  // 21: taomics.praman.accounts.AccountsService.UpdateAdvisor:input_type -> taomics.praman.accounts.AccountsAdvisorUpdateRequest
+	12, // 22: taomics.praman.accounts.AccountsService.CreateAuthorization:input_type -> taomics.praman.accounts.AccountsAuthorizationCreationRequest
+	14, // 23: taomics.praman.accounts.AccountsService.RetrieveAuthorization:input_type -> taomics.praman.accounts.AccountsAuthorizationRetrievalRequest
+	16, // 24: taomics.praman.accounts.AccountsService.GrantAuthorization:input_type -> taomics.praman.accounts.AccountsAuthorizationGrantRequest
+	2,  // 25: taomics.praman.accounts.AccountsService.CurrentUser:output_type -> taomics.praman.accounts.AccountsUserFetchResponse
+	4,  // 26: taomics.praman.accounts.AccountsService.RegisterUser:output_type -> taomics.praman.accounts.AccountsUserCreationResponse
+	6,  // 27: taomics.praman.accounts.AccountsService.UpdateUser:output_type -> taomics.praman.accounts.AccountsUserUpdateResponse
+	22, // 28: taomics.praman.accounts.AccountsService.DisableAccount:output_type -> taomics.praman.Empty
+	8,  // 29: taomics.praman.accounts.AccountsService.CurrentAdvisor:output_type -> taomics.praman.accounts.AccountsAdvisorFetchResponse
+	10, // 30: taomics.praman.accounts.AccountsService.UpdateAdvisor:output_type -> taomics.praman.accounts.AccountsAdvisorUpdateResponse
+	13, // 31: taomics.praman.accounts.AccountsService.CreateAuthorization:output_type -> taomics.praman.accounts.AccountsAuthorizationCreationResponse
+	15, // 32: taomics.praman.accounts.AccountsService.RetrieveAuthorization:output_type -> taomics.praman.accounts.AccountsAuthorizationRetrievalResponse
+	17, // 33: taomics.praman.accounts.AccountsService.GrantAuthorization:output_type -> taomics.praman.accounts.AccountsAuthorizationGrantResponse
+	25, // [25:34] is the sub-list for method output_type
+	16, // [16:25] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
 	16, // [16:16] is the sub-list for extension extendee
 	0,  // [0:16] is the sub-list for field type_name

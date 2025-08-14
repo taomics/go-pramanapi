@@ -23,6 +23,7 @@ const (
 	AccountsService_CurrentUser_FullMethodName           = "/taomics.praman.accounts.AccountsService/CurrentUser"
 	AccountsService_RegisterUser_FullMethodName          = "/taomics.praman.accounts.AccountsService/RegisterUser"
 	AccountsService_UpdateUser_FullMethodName            = "/taomics.praman.accounts.AccountsService/UpdateUser"
+	AccountsService_DisableAccount_FullMethodName        = "/taomics.praman.accounts.AccountsService/DisableAccount"
 	AccountsService_CurrentAdvisor_FullMethodName        = "/taomics.praman.accounts.AccountsService/CurrentAdvisor"
 	AccountsService_UpdateAdvisor_FullMethodName         = "/taomics.praman.accounts.AccountsService/UpdateAdvisor"
 	AccountsService_CreateAuthorization_FullMethodName   = "/taomics.praman.accounts.AccountsService/CreateAuthorization"
@@ -56,6 +57,12 @@ type AccountsServiceClient interface {
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	UpdateUser(ctx context.Context, in *AccountsUserUpdateRequest, opts ...grpc.CallOption) (*AccountsUserUpdateResponse, error)
+	// Disable current user account (account_email).
+	//
+	// Errors:
+	//   - NOT_FOUND (5): The specified user id does not exist.
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	DisableAccount(ctx context.Context, in *pramanapi.Empty, opts ...grpc.CallOption) (*pramanapi.Empty, error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -125,6 +132,16 @@ func (c *accountsServiceClient) UpdateUser(ctx context.Context, in *AccountsUser
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AccountsUserUpdateResponse)
 	err := c.cc.Invoke(ctx, AccountsService_UpdateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsServiceClient) DisableAccount(ctx context.Context, in *pramanapi.Empty, opts ...grpc.CallOption) (*pramanapi.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(pramanapi.Empty)
+	err := c.cc.Invoke(ctx, AccountsService_DisableAccount_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -207,6 +224,12 @@ type AccountsServiceServer interface {
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	UpdateUser(context.Context, *AccountsUserUpdateRequest) (*AccountsUserUpdateResponse, error)
+	// Disable current user account (account_email).
+	//
+	// Errors:
+	//   - NOT_FOUND (5): The specified user id does not exist.
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	DisableAccount(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -260,6 +283,9 @@ func (UnimplementedAccountsServiceServer) RegisterUser(context.Context, *Account
 }
 func (UnimplementedAccountsServiceServer) UpdateUser(context.Context, *AccountsUserUpdateRequest) (*AccountsUserUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedAccountsServiceServer) DisableAccount(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableAccount not implemented")
 }
 func (UnimplementedAccountsServiceServer) CurrentAdvisor(context.Context, *pramanapi.Empty) (*AccountsAdvisorFetchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CurrentAdvisor not implemented")
@@ -347,6 +373,24 @@ func _AccountsService_UpdateUser_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountsServiceServer).UpdateUser(ctx, req.(*AccountsUserUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountsService_DisableAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(pramanapi.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountsServiceServer).DisableAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountsService_DisableAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountsServiceServer).DisableAccount(ctx, req.(*pramanapi.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -459,6 +503,10 @@ var AccountsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _AccountsService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "DisableAccount",
+			Handler:    _AccountsService_DisableAccount_Handler,
 		},
 		{
 			MethodName: "CurrentAdvisor",

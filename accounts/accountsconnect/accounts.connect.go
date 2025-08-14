@@ -43,6 +43,9 @@ const (
 	// AccountsServiceUpdateUserProcedure is the fully-qualified name of the AccountsService's
 	// UpdateUser RPC.
 	AccountsServiceUpdateUserProcedure = "/taomics.praman.accounts.AccountsService/UpdateUser"
+	// AccountsServiceDisableAccountProcedure is the fully-qualified name of the AccountsService's
+	// DisableAccount RPC.
+	AccountsServiceDisableAccountProcedure = "/taomics.praman.accounts.AccountsService/DisableAccount"
 	// AccountsServiceCurrentAdvisorProcedure is the fully-qualified name of the AccountsService's
 	// CurrentAdvisor RPC.
 	AccountsServiceCurrentAdvisorProcedure = "/taomics.praman.accounts.AccountsService/CurrentAdvisor"
@@ -78,6 +81,12 @@ type AccountsServiceClient interface {
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	UpdateUser(context.Context, *connect.Request[accounts.AccountsUserUpdateRequest]) (*connect.Response[accounts.AccountsUserUpdateResponse], error)
+	// Disable current user account (account_email).
+	//
+	// Errors:
+	//   - NOT_FOUND (5): The specified user id does not exist.
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	DisableAccount(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -144,6 +153,12 @@ func NewAccountsServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(accountsServiceMethods.ByName("UpdateUser")),
 			connect.WithClientOptions(opts...),
 		),
+		disableAccount: connect.NewClient[pramanapi.Empty, pramanapi.Empty](
+			httpClient,
+			baseURL+AccountsServiceDisableAccountProcedure,
+			connect.WithSchema(accountsServiceMethods.ByName("DisableAccount")),
+			connect.WithClientOptions(opts...),
+		),
 		currentAdvisor: connect.NewClient[pramanapi.Empty, accounts.AccountsAdvisorFetchResponse](
 			httpClient,
 			baseURL+AccountsServiceCurrentAdvisorProcedure,
@@ -182,6 +197,7 @@ type accountsServiceClient struct {
 	currentUser           *connect.Client[pramanapi.Empty, accounts.AccountsUserFetchResponse]
 	registerUser          *connect.Client[accounts.AccountsUserCreationRequest, accounts.AccountsUserCreationResponse]
 	updateUser            *connect.Client[accounts.AccountsUserUpdateRequest, accounts.AccountsUserUpdateResponse]
+	disableAccount        *connect.Client[pramanapi.Empty, pramanapi.Empty]
 	currentAdvisor        *connect.Client[pramanapi.Empty, accounts.AccountsAdvisorFetchResponse]
 	updateAdvisor         *connect.Client[accounts.AccountsAdvisorUpdateRequest, accounts.AccountsAdvisorUpdateResponse]
 	createAuthorization   *connect.Client[accounts.AccountsAuthorizationCreationRequest, accounts.AccountsAuthorizationCreationResponse]
@@ -202,6 +218,11 @@ func (c *accountsServiceClient) RegisterUser(ctx context.Context, req *connect.R
 // UpdateUser calls taomics.praman.accounts.AccountsService.UpdateUser.
 func (c *accountsServiceClient) UpdateUser(ctx context.Context, req *connect.Request[accounts.AccountsUserUpdateRequest]) (*connect.Response[accounts.AccountsUserUpdateResponse], error) {
 	return c.updateUser.CallUnary(ctx, req)
+}
+
+// DisableAccount calls taomics.praman.accounts.AccountsService.DisableAccount.
+func (c *accountsServiceClient) DisableAccount(ctx context.Context, req *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error) {
+	return c.disableAccount.CallUnary(ctx, req)
 }
 
 // CurrentAdvisor calls taomics.praman.accounts.AccountsService.CurrentAdvisor.
@@ -248,6 +269,12 @@ type AccountsServiceHandler interface {
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	UpdateUser(context.Context, *connect.Request[accounts.AccountsUserUpdateRequest]) (*connect.Response[accounts.AccountsUserUpdateResponse], error)
+	// Disable current user account (account_email).
+	//
+	// Errors:
+	//   - NOT_FOUND (5): The specified user id does not exist.
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	DisableAccount(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -310,6 +337,12 @@ func NewAccountsServiceHandler(svc AccountsServiceHandler, opts ...connect.Handl
 		connect.WithSchema(accountsServiceMethods.ByName("UpdateUser")),
 		connect.WithHandlerOptions(opts...),
 	)
+	accountsServiceDisableAccountHandler := connect.NewUnaryHandler(
+		AccountsServiceDisableAccountProcedure,
+		svc.DisableAccount,
+		connect.WithSchema(accountsServiceMethods.ByName("DisableAccount")),
+		connect.WithHandlerOptions(opts...),
+	)
 	accountsServiceCurrentAdvisorHandler := connect.NewUnaryHandler(
 		AccountsServiceCurrentAdvisorProcedure,
 		svc.CurrentAdvisor,
@@ -348,6 +381,8 @@ func NewAccountsServiceHandler(svc AccountsServiceHandler, opts ...connect.Handl
 			accountsServiceRegisterUserHandler.ServeHTTP(w, r)
 		case AccountsServiceUpdateUserProcedure:
 			accountsServiceUpdateUserHandler.ServeHTTP(w, r)
+		case AccountsServiceDisableAccountProcedure:
+			accountsServiceDisableAccountHandler.ServeHTTP(w, r)
 		case AccountsServiceCurrentAdvisorProcedure:
 			accountsServiceCurrentAdvisorHandler.ServeHTTP(w, r)
 		case AccountsServiceUpdateAdvisorProcedure:
@@ -377,6 +412,10 @@ func (UnimplementedAccountsServiceHandler) RegisterUser(context.Context, *connec
 
 func (UnimplementedAccountsServiceHandler) UpdateUser(context.Context, *connect.Request[accounts.AccountsUserUpdateRequest]) (*connect.Response[accounts.AccountsUserUpdateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.accounts.AccountsService.UpdateUser is not implemented"))
+}
+
+func (UnimplementedAccountsServiceHandler) DisableAccount(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.accounts.AccountsService.DisableAccount is not implemented"))
 }
 
 func (UnimplementedAccountsServiceHandler) CurrentAdvisor(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[accounts.AccountsAdvisorFetchResponse], error) {
