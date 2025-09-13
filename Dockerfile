@@ -26,7 +26,7 @@ RUN case "${TARGETPLATFORM}" in \
 RUN echo "protoc ${PROTOC_VER}-${TARGETPLATFORM}"
 
 RUN apt-get update -y && \
-    apt-get install wget unzip make -y && \
+    apt-get install wget unzip -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
