@@ -1,45 +1,32 @@
-PROTO_GO_PKG := github.com/taomics/pramanapi
-PROTO_OUT := .
 VERSION := 0.20250814.0
 API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/v$(VERSION).zip
-GO_TEST :=
+PRAMANAPI_DIR := ./tmp/pramanapi
 
 .PHONY: all
 
 all: protoc
 
-.PHONY: tools
-
-GOBIN := $(PWD)/tools
-PATH := $(GOBIN):$(PATH)
-
-export GOBIN
-export PATH
-
-tools:
-	$(MAKE) -C tools
-
 .PHONY: protoc
 
-PROTOC := protoc \
-					-I=tmp/pramanapi \
-					-I=tmp/pramanapi/accounts \
-					-I=tmp/pramanapi/lifestylejournal \
-					-I=tmp/pramanapi/recordlog \
-					-I=tmp/pramanapi/externaldata \
-					--go_out=$(PROTO_OUT) --go_opt=paths=source_relative  \
-					--go-grpc_out=$(PROTO_OUT) --go-grpc_opt=paths=source_relative \
-					--connect-go_out=$(PROTO_OUT) --connect-go_opt=paths=source_relative
+PROTOC := docker run --rm -v $(PWD):/workspace/go-pramanapi -v $(PRAMANAPI_DIR):/workspace/pramanapi -w /workspace --platform=linux/amd64 protoc:latest \
+	-I=pramanapi \
+	-I=pramanapi/accounts \
+	-I=pramanapi/lifestylejournal \
+	-I=pramanapi/recordlog \
+	-I=pramanapi/externaldata \
+	--go_out=go-pramanapi --go_opt=paths=source_relative  \
+	--go-grpc_out=go-pramanapi --go-grpc_opt=paths=source_relative \
+	--connect-go_out=go-pramanapi --connect-go_opt=paths=source_relative
 
-protoc: tmp/pramanapi tools
-	$(PROTOC) tmp/pramanapi/*.proto
-	$(PROTOC) tmp/pramanapi/accounts/*.proto
-	$(PROTOC) tmp/pramanapi/lifestylejournal/*.proto
-	$(PROTOC) tmp/pramanapi/recordlog/*.proto
-	$(PROTOC) tmp/pramanapi/externaldata/*.proto
-	$(PROTOC) tmp/pramanapi/healthcheck/*.proto
-	$(PROTOC) tmp/pramanapi/healthfeedback/*.proto
-	go mod init $(PROTO_GO_PKG); go mod tidy
+protoc: .protoc-image-version $(PRAMANAPI_DIR)
+	$(PROTOC) 'pramanapi/*.proto'
+	$(PROTOC) 'pramanapi/accounts/*.proto'
+	$(PROTOC) 'pramanapi/lifestylejournal/*.proto'
+	$(PROTOC) 'pramanapi/recordlog/*.proto'
+	$(PROTOC) 'pramanapi/externaldata/*.proto'
+	$(PROTOC) 'pramanapi/healthcheck/*.proto'
+	$(PROTOC) 'pramanapi/healthfeedback/*.proto'
+	go mod init github.com/taomics/pramanapi; go mod tidy
 
 tmp/pramanapi: tmp/pramanapi.zip
 	cd tmp; unzip pramanapi.zip
@@ -49,6 +36,13 @@ tmp/pramanapi: tmp/pramanapi.zip
 tmp/pramanapi.zip:
 	- mkdir tmp
 	curl -L -o tmp/pramanapi.zip $(API_URL)
+
+.PHONY: image
+image: .protoc-image-version
+
+.protoc-image-version: Dockerfile docker-entrypoint.sh .dockerignore
+	docker build --platform=linux/amd64 -t protoc:latest .
+	docker images -q protoc:latest > .protoc-image-version
 
 .PHONY: clean
 clean:
