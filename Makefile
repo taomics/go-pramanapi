@@ -8,7 +8,7 @@ all: protoc
 
 .PHONY: protoc
 
-PROTOC := docker run -it --rm -v $(PWD):/workspace/go-pramanapi -v $(PRAMANAPI_DIR):/workspace/pramanapi -w /workspace --platform=linux/amd64 protoc:latest \
+PROTOC := docker run --rm -v $(PWD):/workspace/go-pramanapi -v $(PRAMANAPI_DIR):/workspace/pramanapi -w /workspace --platform=linux/amd64 protoc:latest \
 	-I=pramanapi \
 	-I=pramanapi/accounts \
 	-I=pramanapi/lifestylejournal \
