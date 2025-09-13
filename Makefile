@@ -19,7 +19,7 @@ PROTOC := docker run -it --rm -v $(PWD):/workspace/go-pramanapi -v $(PRAMANAPI_D
 	--connect-go_out=go-pramanapi --connect-go_opt=paths=source_relative
 
 protoc: .protoc-image-version $(PRAMANAPI_DIR)
-	$(PROTOC) 'pramanapi/praman.proto'
+	$(PROTOC) 'pramanapi/*.proto'
 	$(PROTOC) 'pramanapi/accounts/*.proto'
 	$(PROTOC) 'pramanapi/lifestylejournal/*.proto'
 	$(PROTOC) 'pramanapi/recordlog/*.proto'
