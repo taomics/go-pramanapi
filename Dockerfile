@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS gen_go_grpc
+FROM golang:1.24-alpine AS gen_go_grpc
 
 ARG GEN_GO_VER=1.34.2
 ARG GEN_GO_GRPC_VER=1.5.1
