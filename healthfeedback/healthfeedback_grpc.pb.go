@@ -23,6 +23,9 @@ const (
 	HealthFeedbackService_GetHealthFeedback_FullMethodName  = "/taomics.praman.healthfeedback.HealthFeedbackService/GetHealthFeedback"
 	HealthFeedbackService_RateHealthFeedback_FullMethodName = "/taomics.praman.healthfeedback.HealthFeedbackService/RateHealthFeedback"
 	HealthFeedbackService_SetHealthMode_FullMethodName      = "/taomics.praman.healthfeedback.HealthFeedbackService/SetHealthMode"
+	HealthFeedbackService_GetWeeklyProgress_FullMethodName  = "/taomics.praman.healthfeedback.HealthFeedbackService/GetWeeklyProgress"
+	HealthFeedbackService_GetWeeklyReport_FullMethodName    = "/taomics.praman.healthfeedback.HealthFeedbackService/GetWeeklyReport"
+	HealthFeedbackService_RateWeeklyReport_FullMethodName   = "/taomics.praman.healthfeedback.HealthFeedbackService/RateWeeklyReport"
 )
 
 // HealthFeedbackServiceClient is the client API for HealthFeedbackService service.
@@ -52,6 +55,23 @@ type HealthFeedbackServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): mode is missing.
 	SetHealthMode(ctx context.Context, in *SetHealthModeRequest, opts ...grpc.CallOption) (*pramanapi.Empty, error)
+	// GetWeeklyProgress
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no progress.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyProgress(ctx context.Context, in *GetWeeklyProgressRequest, opts ...grpc.CallOption) (*GetWeeklyProgressResponse, error)
+	// GetWeeklyReport
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no report.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyReport(ctx context.Context, in *GetWeeklyReportRequest, opts ...grpc.CallOption) (*GetWeeklyReportResponse, error)
+	// RateWeeklyReport
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid, or rating is UNRATED.
+	RateWeeklyReport(ctx context.Context, in *RateWeeklyReportRequest, opts ...grpc.CallOption) (*pramanapi.Empty, error)
 }
 
 type healthFeedbackServiceClient struct {
@@ -92,6 +112,36 @@ func (c *healthFeedbackServiceClient) SetHealthMode(ctx context.Context, in *Set
 	return out, nil
 }
 
+func (c *healthFeedbackServiceClient) GetWeeklyProgress(ctx context.Context, in *GetWeeklyProgressRequest, opts ...grpc.CallOption) (*GetWeeklyProgressResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWeeklyProgressResponse)
+	err := c.cc.Invoke(ctx, HealthFeedbackService_GetWeeklyProgress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *healthFeedbackServiceClient) GetWeeklyReport(ctx context.Context, in *GetWeeklyReportRequest, opts ...grpc.CallOption) (*GetWeeklyReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWeeklyReportResponse)
+	err := c.cc.Invoke(ctx, HealthFeedbackService_GetWeeklyReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *healthFeedbackServiceClient) RateWeeklyReport(ctx context.Context, in *RateWeeklyReportRequest, opts ...grpc.CallOption) (*pramanapi.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(pramanapi.Empty)
+	err := c.cc.Invoke(ctx, HealthFeedbackService_RateWeeklyReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HealthFeedbackServiceServer is the server API for HealthFeedbackService service.
 // All implementations must embed UnimplementedHealthFeedbackServiceServer
 // for forward compatibility.
@@ -119,6 +169,23 @@ type HealthFeedbackServiceServer interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): mode is missing.
 	SetHealthMode(context.Context, *SetHealthModeRequest) (*pramanapi.Empty, error)
+	// GetWeeklyProgress
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no progress.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyProgress(context.Context, *GetWeeklyProgressRequest) (*GetWeeklyProgressResponse, error)
+	// GetWeeklyReport
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no report.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyReport(context.Context, *GetWeeklyReportRequest) (*GetWeeklyReportResponse, error)
+	// RateWeeklyReport
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid, or rating is UNRATED.
+	RateWeeklyReport(context.Context, *RateWeeklyReportRequest) (*pramanapi.Empty, error)
 	mustEmbedUnimplementedHealthFeedbackServiceServer()
 }
 
@@ -137,6 +204,15 @@ func (UnimplementedHealthFeedbackServiceServer) RateHealthFeedback(context.Conte
 }
 func (UnimplementedHealthFeedbackServiceServer) SetHealthMode(context.Context, *SetHealthModeRequest) (*pramanapi.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetHealthMode not implemented")
+}
+func (UnimplementedHealthFeedbackServiceServer) GetWeeklyProgress(context.Context, *GetWeeklyProgressRequest) (*GetWeeklyProgressResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWeeklyProgress not implemented")
+}
+func (UnimplementedHealthFeedbackServiceServer) GetWeeklyReport(context.Context, *GetWeeklyReportRequest) (*GetWeeklyReportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWeeklyReport not implemented")
+}
+func (UnimplementedHealthFeedbackServiceServer) RateWeeklyReport(context.Context, *RateWeeklyReportRequest) (*pramanapi.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RateWeeklyReport not implemented")
 }
 func (UnimplementedHealthFeedbackServiceServer) mustEmbedUnimplementedHealthFeedbackServiceServer() {}
 func (UnimplementedHealthFeedbackServiceServer) testEmbeddedByValue()                               {}
@@ -213,6 +289,60 @@ func _HealthFeedbackService_SetHealthMode_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HealthFeedbackService_GetWeeklyProgress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWeeklyProgressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthFeedbackServiceServer).GetWeeklyProgress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthFeedbackService_GetWeeklyProgress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthFeedbackServiceServer).GetWeeklyProgress(ctx, req.(*GetWeeklyProgressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HealthFeedbackService_GetWeeklyReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWeeklyReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthFeedbackServiceServer).GetWeeklyReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthFeedbackService_GetWeeklyReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthFeedbackServiceServer).GetWeeklyReport(ctx, req.(*GetWeeklyReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HealthFeedbackService_RateWeeklyReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RateWeeklyReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthFeedbackServiceServer).RateWeeklyReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthFeedbackService_RateWeeklyReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthFeedbackServiceServer).RateWeeklyReport(ctx, req.(*RateWeeklyReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HealthFeedbackService_ServiceDesc is the grpc.ServiceDesc for HealthFeedbackService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -231,6 +361,18 @@ var HealthFeedbackService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetHealthMode",
 			Handler:    _HealthFeedbackService_SetHealthMode_Handler,
+		},
+		{
+			MethodName: "GetWeeklyProgress",
+			Handler:    _HealthFeedbackService_GetWeeklyProgress_Handler,
+		},
+		{
+			MethodName: "GetWeeklyReport",
+			Handler:    _HealthFeedbackService_GetWeeklyReport_Handler,
+		},
+		{
+			MethodName: "RateWeeklyReport",
+			Handler:    _HealthFeedbackService_RateWeeklyReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

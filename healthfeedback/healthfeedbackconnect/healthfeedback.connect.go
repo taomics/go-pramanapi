@@ -43,6 +43,15 @@ const (
 	// HealthFeedbackServiceSetHealthModeProcedure is the fully-qualified name of the
 	// HealthFeedbackService's SetHealthMode RPC.
 	HealthFeedbackServiceSetHealthModeProcedure = "/taomics.praman.healthfeedback.HealthFeedbackService/SetHealthMode"
+	// HealthFeedbackServiceGetWeeklyProgressProcedure is the fully-qualified name of the
+	// HealthFeedbackService's GetWeeklyProgress RPC.
+	HealthFeedbackServiceGetWeeklyProgressProcedure = "/taomics.praman.healthfeedback.HealthFeedbackService/GetWeeklyProgress"
+	// HealthFeedbackServiceGetWeeklyReportProcedure is the fully-qualified name of the
+	// HealthFeedbackService's GetWeeklyReport RPC.
+	HealthFeedbackServiceGetWeeklyReportProcedure = "/taomics.praman.healthfeedback.HealthFeedbackService/GetWeeklyReport"
+	// HealthFeedbackServiceRateWeeklyReportProcedure is the fully-qualified name of the
+	// HealthFeedbackService's RateWeeklyReport RPC.
+	HealthFeedbackServiceRateWeeklyReportProcedure = "/taomics.praman.healthfeedback.HealthFeedbackService/RateWeeklyReport"
 )
 
 // HealthFeedbackServiceClient is a client for the
@@ -64,6 +73,23 @@ type HealthFeedbackServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): mode is missing.
 	SetHealthMode(context.Context, *connect.Request[healthfeedback.SetHealthModeRequest]) (*connect.Response[pramanapi.Empty], error)
+	// GetWeeklyProgress
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no progress.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyProgress(context.Context, *connect.Request[healthfeedback.GetWeeklyProgressRequest]) (*connect.Response[healthfeedback.GetWeeklyProgressResponse], error)
+	// GetWeeklyReport
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no report.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyReport(context.Context, *connect.Request[healthfeedback.GetWeeklyReportRequest]) (*connect.Response[healthfeedback.GetWeeklyReportResponse], error)
+	// RateWeeklyReport
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid, or rating is UNRATED.
+	RateWeeklyReport(context.Context, *connect.Request[healthfeedback.RateWeeklyReportRequest]) (*connect.Response[pramanapi.Empty], error)
 }
 
 // NewHealthFeedbackServiceClient constructs a client for the
@@ -96,6 +122,24 @@ func NewHealthFeedbackServiceClient(httpClient connect.HTTPClient, baseURL strin
 			connect.WithSchema(healthFeedbackServiceMethods.ByName("SetHealthMode")),
 			connect.WithClientOptions(opts...),
 		),
+		getWeeklyProgress: connect.NewClient[healthfeedback.GetWeeklyProgressRequest, healthfeedback.GetWeeklyProgressResponse](
+			httpClient,
+			baseURL+HealthFeedbackServiceGetWeeklyProgressProcedure,
+			connect.WithSchema(healthFeedbackServiceMethods.ByName("GetWeeklyProgress")),
+			connect.WithClientOptions(opts...),
+		),
+		getWeeklyReport: connect.NewClient[healthfeedback.GetWeeklyReportRequest, healthfeedback.GetWeeklyReportResponse](
+			httpClient,
+			baseURL+HealthFeedbackServiceGetWeeklyReportProcedure,
+			connect.WithSchema(healthFeedbackServiceMethods.ByName("GetWeeklyReport")),
+			connect.WithClientOptions(opts...),
+		),
+		rateWeeklyReport: connect.NewClient[healthfeedback.RateWeeklyReportRequest, pramanapi.Empty](
+			httpClient,
+			baseURL+HealthFeedbackServiceRateWeeklyReportProcedure,
+			connect.WithSchema(healthFeedbackServiceMethods.ByName("RateWeeklyReport")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -104,6 +148,9 @@ type healthFeedbackServiceClient struct {
 	getHealthFeedback  *connect.Client[healthfeedback.GetHealthFeedbackRequest, healthfeedback.GetHealthFeedbackResponse]
 	rateHealthFeedback *connect.Client[healthfeedback.RateHealthFeedbackRequest, pramanapi.Empty]
 	setHealthMode      *connect.Client[healthfeedback.SetHealthModeRequest, pramanapi.Empty]
+	getWeeklyProgress  *connect.Client[healthfeedback.GetWeeklyProgressRequest, healthfeedback.GetWeeklyProgressResponse]
+	getWeeklyReport    *connect.Client[healthfeedback.GetWeeklyReportRequest, healthfeedback.GetWeeklyReportResponse]
+	rateWeeklyReport   *connect.Client[healthfeedback.RateWeeklyReportRequest, pramanapi.Empty]
 }
 
 // GetHealthFeedback calls taomics.praman.healthfeedback.HealthFeedbackService.GetHealthFeedback.
@@ -119,6 +166,21 @@ func (c *healthFeedbackServiceClient) RateHealthFeedback(ctx context.Context, re
 // SetHealthMode calls taomics.praman.healthfeedback.HealthFeedbackService.SetHealthMode.
 func (c *healthFeedbackServiceClient) SetHealthMode(ctx context.Context, req *connect.Request[healthfeedback.SetHealthModeRequest]) (*connect.Response[pramanapi.Empty], error) {
 	return c.setHealthMode.CallUnary(ctx, req)
+}
+
+// GetWeeklyProgress calls taomics.praman.healthfeedback.HealthFeedbackService.GetWeeklyProgress.
+func (c *healthFeedbackServiceClient) GetWeeklyProgress(ctx context.Context, req *connect.Request[healthfeedback.GetWeeklyProgressRequest]) (*connect.Response[healthfeedback.GetWeeklyProgressResponse], error) {
+	return c.getWeeklyProgress.CallUnary(ctx, req)
+}
+
+// GetWeeklyReport calls taomics.praman.healthfeedback.HealthFeedbackService.GetWeeklyReport.
+func (c *healthFeedbackServiceClient) GetWeeklyReport(ctx context.Context, req *connect.Request[healthfeedback.GetWeeklyReportRequest]) (*connect.Response[healthfeedback.GetWeeklyReportResponse], error) {
+	return c.getWeeklyReport.CallUnary(ctx, req)
+}
+
+// RateWeeklyReport calls taomics.praman.healthfeedback.HealthFeedbackService.RateWeeklyReport.
+func (c *healthFeedbackServiceClient) RateWeeklyReport(ctx context.Context, req *connect.Request[healthfeedback.RateWeeklyReportRequest]) (*connect.Response[pramanapi.Empty], error) {
+	return c.rateWeeklyReport.CallUnary(ctx, req)
 }
 
 // HealthFeedbackServiceHandler is an implementation of the
@@ -140,6 +202,23 @@ type HealthFeedbackServiceHandler interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): mode is missing.
 	SetHealthMode(context.Context, *connect.Request[healthfeedback.SetHealthModeRequest]) (*connect.Response[pramanapi.Empty], error)
+	// GetWeeklyProgress
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no progress.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyProgress(context.Context, *connect.Request[healthfeedback.GetWeeklyProgressRequest]) (*connect.Response[healthfeedback.GetWeeklyProgressResponse], error)
+	// GetWeeklyReport
+	//
+	// Errors:
+	//   - NOT_FOUND (5): there is no report.
+	//   - FAILED_PRECONDITION (9): health mode is not set.
+	GetWeeklyReport(context.Context, *connect.Request[healthfeedback.GetWeeklyReportRequest]) (*connect.Response[healthfeedback.GetWeeklyReportResponse], error)
+	// RateWeeklyReport
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid, or rating is UNRATED.
+	RateWeeklyReport(context.Context, *connect.Request[healthfeedback.RateWeeklyReportRequest]) (*connect.Response[pramanapi.Empty], error)
 }
 
 // NewHealthFeedbackServiceHandler builds an HTTP handler from the service implementation. It
@@ -167,6 +246,24 @@ func NewHealthFeedbackServiceHandler(svc HealthFeedbackServiceHandler, opts ...c
 		connect.WithSchema(healthFeedbackServiceMethods.ByName("SetHealthMode")),
 		connect.WithHandlerOptions(opts...),
 	)
+	healthFeedbackServiceGetWeeklyProgressHandler := connect.NewUnaryHandler(
+		HealthFeedbackServiceGetWeeklyProgressProcedure,
+		svc.GetWeeklyProgress,
+		connect.WithSchema(healthFeedbackServiceMethods.ByName("GetWeeklyProgress")),
+		connect.WithHandlerOptions(opts...),
+	)
+	healthFeedbackServiceGetWeeklyReportHandler := connect.NewUnaryHandler(
+		HealthFeedbackServiceGetWeeklyReportProcedure,
+		svc.GetWeeklyReport,
+		connect.WithSchema(healthFeedbackServiceMethods.ByName("GetWeeklyReport")),
+		connect.WithHandlerOptions(opts...),
+	)
+	healthFeedbackServiceRateWeeklyReportHandler := connect.NewUnaryHandler(
+		HealthFeedbackServiceRateWeeklyReportProcedure,
+		svc.RateWeeklyReport,
+		connect.WithSchema(healthFeedbackServiceMethods.ByName("RateWeeklyReport")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/taomics.praman.healthfeedback.HealthFeedbackService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case HealthFeedbackServiceGetHealthFeedbackProcedure:
@@ -175,6 +272,12 @@ func NewHealthFeedbackServiceHandler(svc HealthFeedbackServiceHandler, opts ...c
 			healthFeedbackServiceRateHealthFeedbackHandler.ServeHTTP(w, r)
 		case HealthFeedbackServiceSetHealthModeProcedure:
 			healthFeedbackServiceSetHealthModeHandler.ServeHTTP(w, r)
+		case HealthFeedbackServiceGetWeeklyProgressProcedure:
+			healthFeedbackServiceGetWeeklyProgressHandler.ServeHTTP(w, r)
+		case HealthFeedbackServiceGetWeeklyReportProcedure:
+			healthFeedbackServiceGetWeeklyReportHandler.ServeHTTP(w, r)
+		case HealthFeedbackServiceRateWeeklyReportProcedure:
+			healthFeedbackServiceRateWeeklyReportHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -194,4 +297,16 @@ func (UnimplementedHealthFeedbackServiceHandler) RateHealthFeedback(context.Cont
 
 func (UnimplementedHealthFeedbackServiceHandler) SetHealthMode(context.Context, *connect.Request[healthfeedback.SetHealthModeRequest]) (*connect.Response[pramanapi.Empty], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthfeedback.HealthFeedbackService.SetHealthMode is not implemented"))
+}
+
+func (UnimplementedHealthFeedbackServiceHandler) GetWeeklyProgress(context.Context, *connect.Request[healthfeedback.GetWeeklyProgressRequest]) (*connect.Response[healthfeedback.GetWeeklyProgressResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthfeedback.HealthFeedbackService.GetWeeklyProgress is not implemented"))
+}
+
+func (UnimplementedHealthFeedbackServiceHandler) GetWeeklyReport(context.Context, *connect.Request[healthfeedback.GetWeeklyReportRequest]) (*connect.Response[healthfeedback.GetWeeklyReportResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthfeedback.HealthFeedbackService.GetWeeklyReport is not implemented"))
+}
+
+func (UnimplementedHealthFeedbackServiceHandler) RateWeeklyReport(context.Context, *connect.Request[healthfeedback.RateWeeklyReportRequest]) (*connect.Response[pramanapi.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthfeedback.HealthFeedbackService.RateWeeklyReport is not implemented"))
 }
