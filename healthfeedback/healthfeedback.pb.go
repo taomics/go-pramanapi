@@ -192,7 +192,7 @@ type GetHealthFeedbackResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// health_feedback will be null if threre is no feedback and the new health feedback is
+	// health_feedback will be null if there is no feedback and the new health feedback is
 	// generating.
 	HealthFeedback *HealthFeedback `protobuf:"bytes,1,opt,name=health_feedback,json=healthFeedback,proto3" json:"health_feedback,omitempty"`
 	// generating is true if the new health feedback is generating.
