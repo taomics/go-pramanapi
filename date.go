@@ -31,7 +31,7 @@ func (d *Date) DaysFrom(t time.Time) int {
 }
 
 // Time converts a Date to a time.Time (at midnight UTC).
-// Usally, Date is initialized using user input, so this function returns an error if the Date is invalid.
+// Usually, Date is initialized using user input, so this function returns an error if the Date is invalid.
 func (d *Date) Time() (time.Time, error) {
 	return time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", d.Year, d.Month, d.Day))
 }
