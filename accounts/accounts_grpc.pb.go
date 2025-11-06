@@ -24,6 +24,8 @@ const (
 	AccountsService_RegisterUser_FullMethodName          = "/taomics.praman.accounts.AccountsService/RegisterUser"
 	AccountsService_UpdateUser_FullMethodName            = "/taomics.praman.accounts.AccountsService/UpdateUser"
 	AccountsService_DisableAccount_FullMethodName        = "/taomics.praman.accounts.AccountsService/DisableAccount"
+	AccountsService_VerifyEmail_FullMethodName           = "/taomics.praman.accounts.AccountsService/VerifyEmail"
+	AccountsService_SendVerificationEmail_FullMethodName = "/taomics.praman.accounts.AccountsService/SendVerificationEmail"
 	AccountsService_CurrentAdvisor_FullMethodName        = "/taomics.praman.accounts.AccountsService/CurrentAdvisor"
 	AccountsService_UpdateAdvisor_FullMethodName         = "/taomics.praman.accounts.AccountsService/UpdateAdvisor"
 	AccountsService_CreateAuthorization_FullMethodName   = "/taomics.praman.accounts.AccountsService/CreateAuthorization"
@@ -63,6 +65,19 @@ type AccountsServiceClient interface {
 	//   - NOT_FOUND (5): The specified user id does not exist.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	DisableAccount(ctx context.Context, in *pramanapi.Empty, opts ...grpc.CallOption) (*pramanapi.Empty, error)
+	// Verify current user email.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*pramanapi.Empty, error)
+	// Send verification email to current user email.
+	//
+	// Errors:
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	SendVerificationEmail(ctx context.Context, in *pramanapi.Empty, opts ...grpc.CallOption) (*pramanapi.Empty, error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -142,6 +157,26 @@ func (c *accountsServiceClient) DisableAccount(ctx context.Context, in *pramanap
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(pramanapi.Empty)
 	err := c.cc.Invoke(ctx, AccountsService_DisableAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsServiceClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*pramanapi.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(pramanapi.Empty)
+	err := c.cc.Invoke(ctx, AccountsService_VerifyEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountsServiceClient) SendVerificationEmail(ctx context.Context, in *pramanapi.Empty, opts ...grpc.CallOption) (*pramanapi.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(pramanapi.Empty)
+	err := c.cc.Invoke(ctx, AccountsService_SendVerificationEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -230,6 +265,19 @@ type AccountsServiceServer interface {
 	//   - NOT_FOUND (5): The specified user id does not exist.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	DisableAccount(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error)
+	// Verify current user email.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*pramanapi.Empty, error)
+	// Send verification email to current user email.
+	//
+	// Errors:
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	SendVerificationEmail(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -286,6 +334,12 @@ func (UnimplementedAccountsServiceServer) UpdateUser(context.Context, *AccountsU
 }
 func (UnimplementedAccountsServiceServer) DisableAccount(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisableAccount not implemented")
+}
+func (UnimplementedAccountsServiceServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*pramanapi.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
+}
+func (UnimplementedAccountsServiceServer) SendVerificationEmail(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
 func (UnimplementedAccountsServiceServer) CurrentAdvisor(context.Context, *pramanapi.Empty) (*AccountsAdvisorFetchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CurrentAdvisor not implemented")
@@ -391,6 +445,42 @@ func _AccountsService_DisableAccount_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountsServiceServer).DisableAccount(ctx, req.(*pramanapi.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountsService_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountsServiceServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountsService_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountsServiceServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountsService_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(pramanapi.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountsServiceServer).SendVerificationEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountsService_SendVerificationEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountsServiceServer).SendVerificationEmail(ctx, req.(*pramanapi.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -507,6 +597,14 @@ var AccountsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DisableAccount",
 			Handler:    _AccountsService_DisableAccount_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _AccountsService_VerifyEmail_Handler,
+		},
+		{
+			MethodName: "SendVerificationEmail",
+			Handler:    _AccountsService_SendVerificationEmail_Handler,
 		},
 		{
 			MethodName: "CurrentAdvisor",

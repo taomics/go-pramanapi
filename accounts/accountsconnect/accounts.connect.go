@@ -46,6 +46,12 @@ const (
 	// AccountsServiceDisableAccountProcedure is the fully-qualified name of the AccountsService's
 	// DisableAccount RPC.
 	AccountsServiceDisableAccountProcedure = "/taomics.praman.accounts.AccountsService/DisableAccount"
+	// AccountsServiceVerifyEmailProcedure is the fully-qualified name of the AccountsService's
+	// VerifyEmail RPC.
+	AccountsServiceVerifyEmailProcedure = "/taomics.praman.accounts.AccountsService/VerifyEmail"
+	// AccountsServiceSendVerificationEmailProcedure is the fully-qualified name of the
+	// AccountsService's SendVerificationEmail RPC.
+	AccountsServiceSendVerificationEmailProcedure = "/taomics.praman.accounts.AccountsService/SendVerificationEmail"
 	// AccountsServiceCurrentAdvisorProcedure is the fully-qualified name of the AccountsService's
 	// CurrentAdvisor RPC.
 	AccountsServiceCurrentAdvisorProcedure = "/taomics.praman.accounts.AccountsService/CurrentAdvisor"
@@ -87,6 +93,19 @@ type AccountsServiceClient interface {
 	//   - NOT_FOUND (5): The specified user id does not exist.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	DisableAccount(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
+	// Verify current user email.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	VerifyEmail(context.Context, *connect.Request[accounts.VerifyEmailRequest]) (*connect.Response[pramanapi.Empty], error)
+	// Send verification email to current user email.
+	//
+	// Errors:
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	SendVerificationEmail(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -159,6 +178,18 @@ func NewAccountsServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(accountsServiceMethods.ByName("DisableAccount")),
 			connect.WithClientOptions(opts...),
 		),
+		verifyEmail: connect.NewClient[accounts.VerifyEmailRequest, pramanapi.Empty](
+			httpClient,
+			baseURL+AccountsServiceVerifyEmailProcedure,
+			connect.WithSchema(accountsServiceMethods.ByName("VerifyEmail")),
+			connect.WithClientOptions(opts...),
+		),
+		sendVerificationEmail: connect.NewClient[pramanapi.Empty, pramanapi.Empty](
+			httpClient,
+			baseURL+AccountsServiceSendVerificationEmailProcedure,
+			connect.WithSchema(accountsServiceMethods.ByName("SendVerificationEmail")),
+			connect.WithClientOptions(opts...),
+		),
 		currentAdvisor: connect.NewClient[pramanapi.Empty, accounts.AccountsAdvisorFetchResponse](
 			httpClient,
 			baseURL+AccountsServiceCurrentAdvisorProcedure,
@@ -198,6 +229,8 @@ type accountsServiceClient struct {
 	registerUser          *connect.Client[accounts.AccountsUserCreationRequest, accounts.AccountsUserCreationResponse]
 	updateUser            *connect.Client[accounts.AccountsUserUpdateRequest, accounts.AccountsUserUpdateResponse]
 	disableAccount        *connect.Client[pramanapi.Empty, pramanapi.Empty]
+	verifyEmail           *connect.Client[accounts.VerifyEmailRequest, pramanapi.Empty]
+	sendVerificationEmail *connect.Client[pramanapi.Empty, pramanapi.Empty]
 	currentAdvisor        *connect.Client[pramanapi.Empty, accounts.AccountsAdvisorFetchResponse]
 	updateAdvisor         *connect.Client[accounts.AccountsAdvisorUpdateRequest, accounts.AccountsAdvisorUpdateResponse]
 	createAuthorization   *connect.Client[accounts.AccountsAuthorizationCreationRequest, accounts.AccountsAuthorizationCreationResponse]
@@ -223,6 +256,16 @@ func (c *accountsServiceClient) UpdateUser(ctx context.Context, req *connect.Req
 // DisableAccount calls taomics.praman.accounts.AccountsService.DisableAccount.
 func (c *accountsServiceClient) DisableAccount(ctx context.Context, req *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error) {
 	return c.disableAccount.CallUnary(ctx, req)
+}
+
+// VerifyEmail calls taomics.praman.accounts.AccountsService.VerifyEmail.
+func (c *accountsServiceClient) VerifyEmail(ctx context.Context, req *connect.Request[accounts.VerifyEmailRequest]) (*connect.Response[pramanapi.Empty], error) {
+	return c.verifyEmail.CallUnary(ctx, req)
+}
+
+// SendVerificationEmail calls taomics.praman.accounts.AccountsService.SendVerificationEmail.
+func (c *accountsServiceClient) SendVerificationEmail(ctx context.Context, req *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error) {
+	return c.sendVerificationEmail.CallUnary(ctx, req)
 }
 
 // CurrentAdvisor calls taomics.praman.accounts.AccountsService.CurrentAdvisor.
@@ -275,6 +318,19 @@ type AccountsServiceHandler interface {
 	//   - NOT_FOUND (5): The specified user id does not exist.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
 	DisableAccount(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
+	// Verify current user email.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	VerifyEmail(context.Context, *connect.Request[accounts.VerifyEmailRequest]) (*connect.Response[pramanapi.Empty], error)
+	// Send verification email to current user email.
+	//
+	// Errors:
+	//   - PERMISSION_DENIED (7): The requester does not have a user permission
+	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	SendVerificationEmail(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
 	// Gets the current advisor profile using authorization header.
 	//
 	// Errors:
@@ -343,6 +399,18 @@ func NewAccountsServiceHandler(svc AccountsServiceHandler, opts ...connect.Handl
 		connect.WithSchema(accountsServiceMethods.ByName("DisableAccount")),
 		connect.WithHandlerOptions(opts...),
 	)
+	accountsServiceVerifyEmailHandler := connect.NewUnaryHandler(
+		AccountsServiceVerifyEmailProcedure,
+		svc.VerifyEmail,
+		connect.WithSchema(accountsServiceMethods.ByName("VerifyEmail")),
+		connect.WithHandlerOptions(opts...),
+	)
+	accountsServiceSendVerificationEmailHandler := connect.NewUnaryHandler(
+		AccountsServiceSendVerificationEmailProcedure,
+		svc.SendVerificationEmail,
+		connect.WithSchema(accountsServiceMethods.ByName("SendVerificationEmail")),
+		connect.WithHandlerOptions(opts...),
+	)
 	accountsServiceCurrentAdvisorHandler := connect.NewUnaryHandler(
 		AccountsServiceCurrentAdvisorProcedure,
 		svc.CurrentAdvisor,
@@ -383,6 +451,10 @@ func NewAccountsServiceHandler(svc AccountsServiceHandler, opts ...connect.Handl
 			accountsServiceUpdateUserHandler.ServeHTTP(w, r)
 		case AccountsServiceDisableAccountProcedure:
 			accountsServiceDisableAccountHandler.ServeHTTP(w, r)
+		case AccountsServiceVerifyEmailProcedure:
+			accountsServiceVerifyEmailHandler.ServeHTTP(w, r)
+		case AccountsServiceSendVerificationEmailProcedure:
+			accountsServiceSendVerificationEmailHandler.ServeHTTP(w, r)
 		case AccountsServiceCurrentAdvisorProcedure:
 			accountsServiceCurrentAdvisorHandler.ServeHTTP(w, r)
 		case AccountsServiceUpdateAdvisorProcedure:
@@ -416,6 +488,14 @@ func (UnimplementedAccountsServiceHandler) UpdateUser(context.Context, *connect.
 
 func (UnimplementedAccountsServiceHandler) DisableAccount(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.accounts.AccountsService.DisableAccount is not implemented"))
+}
+
+func (UnimplementedAccountsServiceHandler) VerifyEmail(context.Context, *connect.Request[accounts.VerifyEmailRequest]) (*connect.Response[pramanapi.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.accounts.AccountsService.VerifyEmail is not implemented"))
+}
+
+func (UnimplementedAccountsServiceHandler) SendVerificationEmail(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.accounts.AccountsService.SendVerificationEmail is not implemented"))
 }
 
 func (UnimplementedAccountsServiceHandler) CurrentAdvisor(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[accounts.AccountsAdvisorFetchResponse], error) {
