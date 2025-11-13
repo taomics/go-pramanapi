@@ -97,14 +97,14 @@ type AccountsServiceClient interface {
 	//
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - DEADLINE_EXCEEDED (4): The verification code is expired.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
 	VerifyEmail(context.Context, *connect.Request[accounts.VerifyEmailRequest]) (*connect.Response[pramanapi.Empty], error)
 	// Send verification email to current user email.
 	//
 	// Errors:
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	//   - RESOURCE_EXHAUSTED (8): Max attempt counts exceeded.
 	SendVerificationEmail(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
 	// Gets the current advisor profile using authorization header.
 	//
@@ -322,14 +322,14 @@ type AccountsServiceHandler interface {
 	//
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - DEADLINE_EXCEEDED (4): The verification code is expired.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
 	VerifyEmail(context.Context, *connect.Request[accounts.VerifyEmailRequest]) (*connect.Response[pramanapi.Empty], error)
 	// Send verification email to current user email.
 	//
 	// Errors:
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	//   - RESOURCE_EXHAUSTED (8): Max attempt counts exceeded.
 	SendVerificationEmail(context.Context, *connect.Request[pramanapi.Empty]) (*connect.Response[pramanapi.Empty], error)
 	// Gets the current advisor profile using authorization header.
 	//

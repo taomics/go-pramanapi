@@ -41,6 +41,8 @@ const (
 //
 // Common Errors:
 //   - INTERNAL (13): Server is something wrong.
+//   - FAILED_PRECONDITION (9): The current user have some problems.
+//   - ErrorInfo is included in the details of the error.
 //   - UNAUTHENTICATED (16): Authorization header is something wrong.
 type AccountsServiceClient interface {
 	// Gets the current user profile using authorization header.
@@ -69,14 +71,14 @@ type AccountsServiceClient interface {
 	//
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - DEADLINE_EXCEEDED (4): The verification code is expired.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*pramanapi.Empty, error)
 	// Send verification email to current user email.
 	//
 	// Errors:
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	//   - RESOURCE_EXHAUSTED (8): Max attempt counts exceeded.
 	SendVerificationEmail(ctx context.Context, in *pramanapi.Empty, opts ...grpc.CallOption) (*pramanapi.Empty, error)
 	// Gets the current advisor profile using authorization header.
 	//
@@ -241,6 +243,8 @@ func (c *accountsServiceClient) GrantAuthorization(ctx context.Context, in *Acco
 //
 // Common Errors:
 //   - INTERNAL (13): Server is something wrong.
+//   - FAILED_PRECONDITION (9): The current user have some problems.
+//   - ErrorInfo is included in the details of the error.
 //   - UNAUTHENTICATED (16): Authorization header is something wrong.
 type AccountsServiceServer interface {
 	// Gets the current user profile using authorization header.
@@ -269,14 +273,14 @@ type AccountsServiceServer interface {
 	//
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
+	//   - DEADLINE_EXCEEDED (4): The verification code is expired.
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission.
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*pramanapi.Empty, error)
 	// Send verification email to current user email.
 	//
 	// Errors:
 	//   - PERMISSION_DENIED (7): The requester does not have a user permission
-	//   - FAILED_PRECONDITION (9): The current user have some problems.
+	//   - RESOURCE_EXHAUSTED (8): Max attempt counts exceeded.
 	SendVerificationEmail(context.Context, *pramanapi.Empty) (*pramanapi.Empty, error)
 	// Gets the current advisor profile using authorization header.
 	//
