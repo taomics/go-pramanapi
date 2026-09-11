@@ -1,4 +1,4 @@
-VERSION := 0.20260525.0
+VERSION := 0.20260911.0
 API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/v$(VERSION).zip
 PRAMANAPI_DIR := ./tmp/pramanapi
 

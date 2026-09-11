@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ExternalDataService_StoreExternalData_FullMethodName      = "/taomics.praman.externaldata.ExternalDataService/StoreExternalData"
+	ExternalDataService_DeleteExternalData_FullMethodName     = "/taomics.praman.externaldata.ExternalDataService/DeleteExternalData"
 	ExternalDataService_GetExternalDataSummary_FullMethodName = "/taomics.praman.externaldata.ExternalDataService/GetExternalDataSummary"
 )
 
@@ -27,7 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// # ExternalDataservice
+// # ExternalDataService
 //
 // Common Errors:
 //   - PERMISSION_DENIED (7): User has no permission to access the resource.
@@ -39,6 +40,19 @@ type ExternalDataServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	StoreExternalData(ctx context.Context, in *StoreExternalDataRequest, opts ...grpc.CallOption) (*StoreExternalDataResponse, error)
+	// Delete external data for the current user.
+	//
+	// A successful response indicates that data in the specified source group
+	// is no longer associated with the current user. Internal processing for
+	// preserving other source groups or physical cleanup may continue or be
+	// handled separately.
+	//
+	// Specify EXTERNAL_DATA_SOURCE_GROUP_ALL to delete all external data.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): Source group is unspecified or invalid.
+	//   - RESOURCE_EXHAUSTED (8): Another deletion was completed within the last hour.
+	DeleteExternalData(ctx context.Context, in *DeleteExternalDataRequest, opts ...grpc.CallOption) (*DeleteExternalDataResponse, error)
 	// Get external data summary.
 	// Errors:
 	//   - NOT_FOUND (5): Specified source is not found.
@@ -63,6 +77,16 @@ func (c *externalDataServiceClient) StoreExternalData(ctx context.Context, in *S
 	return out, nil
 }
 
+func (c *externalDataServiceClient) DeleteExternalData(ctx context.Context, in *DeleteExternalDataRequest, opts ...grpc.CallOption) (*DeleteExternalDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteExternalDataResponse)
+	err := c.cc.Invoke(ctx, ExternalDataService_DeleteExternalData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalDataServiceClient) GetExternalDataSummary(ctx context.Context, in *ExternalDataSummaryRequest, opts ...grpc.CallOption) (*ExternalDataSummaryResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ExternalDataSummaryResponse)
@@ -77,7 +101,7 @@ func (c *externalDataServiceClient) GetExternalDataSummary(ctx context.Context, 
 // All implementations must embed UnimplementedExternalDataServiceServer
 // for forward compatibility.
 //
-// # ExternalDataservice
+// # ExternalDataService
 //
 // Common Errors:
 //   - PERMISSION_DENIED (7): User has no permission to access the resource.
@@ -89,6 +113,19 @@ type ExternalDataServiceServer interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	StoreExternalData(context.Context, *StoreExternalDataRequest) (*StoreExternalDataResponse, error)
+	// Delete external data for the current user.
+	//
+	// A successful response indicates that data in the specified source group
+	// is no longer associated with the current user. Internal processing for
+	// preserving other source groups or physical cleanup may continue or be
+	// handled separately.
+	//
+	// Specify EXTERNAL_DATA_SOURCE_GROUP_ALL to delete all external data.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): Source group is unspecified or invalid.
+	//   - RESOURCE_EXHAUSTED (8): Another deletion was completed within the last hour.
+	DeleteExternalData(context.Context, *DeleteExternalDataRequest) (*DeleteExternalDataResponse, error)
 	// Get external data summary.
 	// Errors:
 	//   - NOT_FOUND (5): Specified source is not found.
@@ -105,6 +142,9 @@ type UnimplementedExternalDataServiceServer struct{}
 
 func (UnimplementedExternalDataServiceServer) StoreExternalData(context.Context, *StoreExternalDataRequest) (*StoreExternalDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StoreExternalData not implemented")
+}
+func (UnimplementedExternalDataServiceServer) DeleteExternalData(context.Context, *DeleteExternalDataRequest) (*DeleteExternalDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteExternalData not implemented")
 }
 func (UnimplementedExternalDataServiceServer) GetExternalDataSummary(context.Context, *ExternalDataSummaryRequest) (*ExternalDataSummaryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExternalDataSummary not implemented")
@@ -148,6 +188,24 @@ func _ExternalDataService_StoreExternalData_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExternalDataService_DeleteExternalData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteExternalDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalDataServiceServer).DeleteExternalData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExternalDataService_DeleteExternalData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalDataServiceServer).DeleteExternalData(ctx, req.(*DeleteExternalDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ExternalDataService_GetExternalDataSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ExternalDataSummaryRequest)
 	if err := dec(in); err != nil {
@@ -176,6 +234,10 @@ var ExternalDataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StoreExternalData",
 			Handler:    _ExternalDataService_StoreExternalData_Handler,
+		},
+		{
+			MethodName: "DeleteExternalData",
+			Handler:    _ExternalDataService_DeleteExternalData_Handler,
 		},
 		{
 			MethodName: "GetExternalDataSummary",

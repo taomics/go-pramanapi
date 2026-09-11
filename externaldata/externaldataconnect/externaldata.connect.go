@@ -36,6 +36,9 @@ const (
 	// ExternalDataServiceStoreExternalDataProcedure is the fully-qualified name of the
 	// ExternalDataService's StoreExternalData RPC.
 	ExternalDataServiceStoreExternalDataProcedure = "/taomics.praman.externaldata.ExternalDataService/StoreExternalData"
+	// ExternalDataServiceDeleteExternalDataProcedure is the fully-qualified name of the
+	// ExternalDataService's DeleteExternalData RPC.
+	ExternalDataServiceDeleteExternalDataProcedure = "/taomics.praman.externaldata.ExternalDataService/DeleteExternalData"
 	// ExternalDataServiceGetExternalDataSummaryProcedure is the fully-qualified name of the
 	// ExternalDataService's GetExternalDataSummary RPC.
 	ExternalDataServiceGetExternalDataSummaryProcedure = "/taomics.praman.externaldata.ExternalDataService/GetExternalDataSummary"
@@ -49,6 +52,19 @@ type ExternalDataServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	StoreExternalData(context.Context, *connect.Request[externaldata.StoreExternalDataRequest]) (*connect.Response[externaldata.StoreExternalDataResponse], error)
+	// Delete external data for the current user.
+	//
+	// A successful response indicates that data in the specified source group
+	// is no longer associated with the current user. Internal processing for
+	// preserving other source groups or physical cleanup may continue or be
+	// handled separately.
+	//
+	// Specify EXTERNAL_DATA_SOURCE_GROUP_ALL to delete all external data.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): Source group is unspecified or invalid.
+	//   - RESOURCE_EXHAUSTED (8): Another deletion was completed within the last hour.
+	DeleteExternalData(context.Context, *connect.Request[externaldata.DeleteExternalDataRequest]) (*connect.Response[externaldata.DeleteExternalDataResponse], error)
 	// Get external data summary.
 	// Errors:
 	//   - NOT_FOUND (5): Specified source is not found.
@@ -73,6 +89,12 @@ func NewExternalDataServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(externalDataServiceMethods.ByName("StoreExternalData")),
 			connect.WithClientOptions(opts...),
 		),
+		deleteExternalData: connect.NewClient[externaldata.DeleteExternalDataRequest, externaldata.DeleteExternalDataResponse](
+			httpClient,
+			baseURL+ExternalDataServiceDeleteExternalDataProcedure,
+			connect.WithSchema(externalDataServiceMethods.ByName("DeleteExternalData")),
+			connect.WithClientOptions(opts...),
+		),
 		getExternalDataSummary: connect.NewClient[externaldata.ExternalDataSummaryRequest, externaldata.ExternalDataSummaryResponse](
 			httpClient,
 			baseURL+ExternalDataServiceGetExternalDataSummaryProcedure,
@@ -85,12 +107,18 @@ func NewExternalDataServiceClient(httpClient connect.HTTPClient, baseURL string,
 // externalDataServiceClient implements ExternalDataServiceClient.
 type externalDataServiceClient struct {
 	storeExternalData      *connect.Client[externaldata.StoreExternalDataRequest, externaldata.StoreExternalDataResponse]
+	deleteExternalData     *connect.Client[externaldata.DeleteExternalDataRequest, externaldata.DeleteExternalDataResponse]
 	getExternalDataSummary *connect.Client[externaldata.ExternalDataSummaryRequest, externaldata.ExternalDataSummaryResponse]
 }
 
 // StoreExternalData calls taomics.praman.externaldata.ExternalDataService.StoreExternalData.
 func (c *externalDataServiceClient) StoreExternalData(ctx context.Context, req *connect.Request[externaldata.StoreExternalDataRequest]) (*connect.Response[externaldata.StoreExternalDataResponse], error) {
 	return c.storeExternalData.CallUnary(ctx, req)
+}
+
+// DeleteExternalData calls taomics.praman.externaldata.ExternalDataService.DeleteExternalData.
+func (c *externalDataServiceClient) DeleteExternalData(ctx context.Context, req *connect.Request[externaldata.DeleteExternalDataRequest]) (*connect.Response[externaldata.DeleteExternalDataResponse], error) {
+	return c.deleteExternalData.CallUnary(ctx, req)
 }
 
 // GetExternalDataSummary calls
@@ -107,6 +135,19 @@ type ExternalDataServiceHandler interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): There is an invalid argument
 	StoreExternalData(context.Context, *connect.Request[externaldata.StoreExternalDataRequest]) (*connect.Response[externaldata.StoreExternalDataResponse], error)
+	// Delete external data for the current user.
+	//
+	// A successful response indicates that data in the specified source group
+	// is no longer associated with the current user. Internal processing for
+	// preserving other source groups or physical cleanup may continue or be
+	// handled separately.
+	//
+	// Specify EXTERNAL_DATA_SOURCE_GROUP_ALL to delete all external data.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): Source group is unspecified or invalid.
+	//   - RESOURCE_EXHAUSTED (8): Another deletion was completed within the last hour.
+	DeleteExternalData(context.Context, *connect.Request[externaldata.DeleteExternalDataRequest]) (*connect.Response[externaldata.DeleteExternalDataResponse], error)
 	// Get external data summary.
 	// Errors:
 	//   - NOT_FOUND (5): Specified source is not found.
@@ -126,6 +167,12 @@ func NewExternalDataServiceHandler(svc ExternalDataServiceHandler, opts ...conne
 		connect.WithSchema(externalDataServiceMethods.ByName("StoreExternalData")),
 		connect.WithHandlerOptions(opts...),
 	)
+	externalDataServiceDeleteExternalDataHandler := connect.NewUnaryHandler(
+		ExternalDataServiceDeleteExternalDataProcedure,
+		svc.DeleteExternalData,
+		connect.WithSchema(externalDataServiceMethods.ByName("DeleteExternalData")),
+		connect.WithHandlerOptions(opts...),
+	)
 	externalDataServiceGetExternalDataSummaryHandler := connect.NewUnaryHandler(
 		ExternalDataServiceGetExternalDataSummaryProcedure,
 		svc.GetExternalDataSummary,
@@ -136,6 +183,8 @@ func NewExternalDataServiceHandler(svc ExternalDataServiceHandler, opts ...conne
 		switch r.URL.Path {
 		case ExternalDataServiceStoreExternalDataProcedure:
 			externalDataServiceStoreExternalDataHandler.ServeHTTP(w, r)
+		case ExternalDataServiceDeleteExternalDataProcedure:
+			externalDataServiceDeleteExternalDataHandler.ServeHTTP(w, r)
 		case ExternalDataServiceGetExternalDataSummaryProcedure:
 			externalDataServiceGetExternalDataSummaryHandler.ServeHTTP(w, r)
 		default:
@@ -149,6 +198,10 @@ type UnimplementedExternalDataServiceHandler struct{}
 
 func (UnimplementedExternalDataServiceHandler) StoreExternalData(context.Context, *connect.Request[externaldata.StoreExternalDataRequest]) (*connect.Response[externaldata.StoreExternalDataResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.externaldata.ExternalDataService.StoreExternalData is not implemented"))
+}
+
+func (UnimplementedExternalDataServiceHandler) DeleteExternalData(context.Context, *connect.Request[externaldata.DeleteExternalDataRequest]) (*connect.Response[externaldata.DeleteExternalDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.externaldata.ExternalDataService.DeleteExternalData is not implemented"))
 }
 
 func (UnimplementedExternalDataServiceHandler) GetExternalDataSummary(context.Context, *connect.Request[externaldata.ExternalDataSummaryRequest]) (*connect.Response[externaldata.ExternalDataSummaryResponse], error) {
