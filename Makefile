@@ -1,4 +1,4 @@
-VERSION := 0.20260911.0
+VERSION := 0.20260914.0
 API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/v$(VERSION).zip
 PRAMANAPI_DIR := ./tmp/pramanapi
 
@@ -26,6 +26,7 @@ protoc: .protoc-image-version $(PRAMANAPI_DIR)
 	$(PROTOC) 'pramanapi/externaldata/*.proto'
 	$(PROTOC) 'pramanapi/healthcheck/*.proto'
 	$(PROTOC) 'pramanapi/healthfeedback/*.proto'
+	$(PROTOC) 'pramanapi/researchstudy/*.proto'
 	go mod init github.com/taomics/pramanapi; go mod tidy
 
 tmp/pramanapi: tmp/pramanapi.zip
