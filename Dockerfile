@@ -20,6 +20,9 @@ RUN case "${TARGETPLATFORM}" in \
       linux/amd64) \
         echo "PROTOC_ARCH=linux-x86_64" > /tmp/env; \
         ;; \
+      linux/arm64) \
+        echo "PROTOC_ARCH=linux-aarch_64" > /tmp/env; \
+        ;; \
       *) exit 99 ;; \
     esac
 

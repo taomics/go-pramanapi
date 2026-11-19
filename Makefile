@@ -1,6 +1,10 @@
 VERSION := 0.20260914.0
 API_URL := https://github.com/taomics/pramanapi/archive/refs/tags/v$(VERSION).zip
-PRAMANAPI_DIR := ./tmp/pramanapi
+
+PRAMANAPI_DIR ?= ./tmp/pramanapi
+CONTAINER_CMD ?= docker
+PLATFORM_FLAG ?= --platform=linux/amd64
+IMAGES_CMD ?= $(CONTAINER_CMD) images -q protoc:latest
 
 .PHONY: all
 
@@ -8,7 +12,7 @@ all: protoc
 
 .PHONY: protoc
 
-PROTOC := docker run --rm -v $(PWD):/workspace/go-pramanapi -v $(PRAMANAPI_DIR):/workspace/pramanapi -w /workspace --platform=linux/amd64 protoc:latest \
+PROTOC := $(CONTAINER_CMD) run --rm -v $(PWD):/workspace/go-pramanapi -v $(PRAMANAPI_DIR):/workspace/pramanapi -w /workspace $(PLATFORM_FLAG) protoc:latest \
 	-I=pramanapi \
 	-I=pramanapi/accounts \
 	-I=pramanapi/lifestylejournal \
@@ -42,8 +46,8 @@ tmp/pramanapi.zip:
 image: .protoc-image-version
 
 .protoc-image-version: Dockerfile docker-entrypoint.sh .dockerignore
-	docker build --platform=linux/amd64 -t protoc:latest .
-	docker images -q protoc:latest > .protoc-image-version
+	$(CONTAINER_CMD) build $(PLATFORM_FLAG) -t protoc:latest .
+	$(IMAGES_CMD) > .protoc-image-version
 
 .PHONY: clean
 clean:
