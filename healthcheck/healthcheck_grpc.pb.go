@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	HealthCheckService_PredictHealthCheck_FullMethodName      = "/taomics.praman.healthcheck.HealthCheckService/PredictHealthCheck"
-	HealthCheckService_UploadHealthCheckResult_FullMethodName = "/taomics.praman.healthcheck.HealthCheckService/UploadHealthCheckResult"
+	HealthCheckService_PredictHealthCheck_FullMethodName          = "/taomics.praman.healthcheck.HealthCheckService/PredictHealthCheck"
+	HealthCheckService_UploadHealthCheckResult_FullMethodName     = "/taomics.praman.healthcheck.HealthCheckService/UploadHealthCheckResult"
+	HealthCheckService_ImportMynaPortalHealthCheck_FullMethodName = "/taomics.praman.healthcheck.HealthCheckService/ImportMynaPortalHealthCheck"
 )
 
 // HealthCheckServiceClient is the client API for HealthCheckService service.
@@ -44,8 +45,16 @@ type HealthCheckServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): The upload data is invalid.
 	//   - FAILED_PRECONDITION (9): The upload data is not acceptable.
-	//   - ALREADY_EXISTS (6): The health check data is already exists.
+	//   - ALREADY_EXISTS (6): The health check data already exists.
 	UploadHealthCheckResult(ctx context.Context, in *UploadHealthCheckResultRequest, opts ...grpc.CallOption) (*UploadHealthCheckResultResponse, error)
+	// Import health check results from Myna Portal API.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): code or redirect_uri is invalid, empty, or expired.
+	//   - FAILED_PRECONDITION (9): User profile (e.g. birthdate or sex) does not match Myna Portal
+	//     record.
+	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
+	ImportMynaPortalHealthCheck(ctx context.Context, in *ImportMynaPortalHealthCheckRequest, opts ...grpc.CallOption) (*ImportMynaPortalHealthCheckResponse, error)
 }
 
 type healthCheckServiceClient struct {
@@ -76,6 +85,16 @@ func (c *healthCheckServiceClient) UploadHealthCheckResult(ctx context.Context, 
 	return out, nil
 }
 
+func (c *healthCheckServiceClient) ImportMynaPortalHealthCheck(ctx context.Context, in *ImportMynaPortalHealthCheckRequest, opts ...grpc.CallOption) (*ImportMynaPortalHealthCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ImportMynaPortalHealthCheckResponse)
+	err := c.cc.Invoke(ctx, HealthCheckService_ImportMynaPortalHealthCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HealthCheckServiceServer is the server API for HealthCheckService service.
 // All implementations must embed UnimplementedHealthCheckServiceServer
 // for forward compatibility.
@@ -97,8 +116,16 @@ type HealthCheckServiceServer interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): The upload data is invalid.
 	//   - FAILED_PRECONDITION (9): The upload data is not acceptable.
-	//   - ALREADY_EXISTS (6): The health check data is already exists.
+	//   - ALREADY_EXISTS (6): The health check data already exists.
 	UploadHealthCheckResult(context.Context, *UploadHealthCheckResultRequest) (*UploadHealthCheckResultResponse, error)
+	// Import health check results from Myna Portal API.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): code or redirect_uri is invalid, empty, or expired.
+	//   - FAILED_PRECONDITION (9): User profile (e.g. birthdate or sex) does not match Myna Portal
+	//     record.
+	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
+	ImportMynaPortalHealthCheck(context.Context, *ImportMynaPortalHealthCheckRequest) (*ImportMynaPortalHealthCheckResponse, error)
 	mustEmbedUnimplementedHealthCheckServiceServer()
 }
 
@@ -114,6 +141,9 @@ func (UnimplementedHealthCheckServiceServer) PredictHealthCheck(context.Context,
 }
 func (UnimplementedHealthCheckServiceServer) UploadHealthCheckResult(context.Context, *UploadHealthCheckResultRequest) (*UploadHealthCheckResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadHealthCheckResult not implemented")
+}
+func (UnimplementedHealthCheckServiceServer) ImportMynaPortalHealthCheck(context.Context, *ImportMynaPortalHealthCheckRequest) (*ImportMynaPortalHealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ImportMynaPortalHealthCheck not implemented")
 }
 func (UnimplementedHealthCheckServiceServer) mustEmbedUnimplementedHealthCheckServiceServer() {}
 func (UnimplementedHealthCheckServiceServer) testEmbeddedByValue()                            {}
@@ -172,6 +202,24 @@ func _HealthCheckService_UploadHealthCheckResult_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HealthCheckService_ImportMynaPortalHealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportMynaPortalHealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthCheckServiceServer).ImportMynaPortalHealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthCheckService_ImportMynaPortalHealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthCheckServiceServer).ImportMynaPortalHealthCheck(ctx, req.(*ImportMynaPortalHealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HealthCheckService_ServiceDesc is the grpc.ServiceDesc for HealthCheckService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -186,6 +234,10 @@ var HealthCheckService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadHealthCheckResult",
 			Handler:    _HealthCheckService_UploadHealthCheckResult_Handler,
+		},
+		{
+			MethodName: "ImportMynaPortalHealthCheck",
+			Handler:    _HealthCheckService_ImportMynaPortalHealthCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

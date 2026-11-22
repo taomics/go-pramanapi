@@ -39,6 +39,9 @@ const (
 	// HealthCheckServiceUploadHealthCheckResultProcedure is the fully-qualified name of the
 	// HealthCheckService's UploadHealthCheckResult RPC.
 	HealthCheckServiceUploadHealthCheckResultProcedure = "/taomics.praman.healthcheck.HealthCheckService/UploadHealthCheckResult"
+	// HealthCheckServiceImportMynaPortalHealthCheckProcedure is the fully-qualified name of the
+	// HealthCheckService's ImportMynaPortalHealthCheck RPC.
+	HealthCheckServiceImportMynaPortalHealthCheckProcedure = "/taomics.praman.healthcheck.HealthCheckService/ImportMynaPortalHealthCheck"
 )
 
 // HealthCheckServiceClient is a client for the taomics.praman.healthcheck.HealthCheckService
@@ -54,8 +57,16 @@ type HealthCheckServiceClient interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): The upload data is invalid.
 	//   - FAILED_PRECONDITION (9): The upload data is not acceptable.
-	//   - ALREADY_EXISTS (6): The health check data is already exists.
+	//   - ALREADY_EXISTS (6): The health check data already exists.
 	UploadHealthCheckResult(context.Context, *connect.Request[healthcheck.UploadHealthCheckResultRequest]) (*connect.Response[healthcheck.UploadHealthCheckResultResponse], error)
+	// Import health check results from Myna Portal API.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): code or redirect_uri is invalid, empty, or expired.
+	//   - FAILED_PRECONDITION (9): User profile (e.g. birthdate or sex) does not match Myna Portal
+	//     record.
+	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
+	ImportMynaPortalHealthCheck(context.Context, *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error)
 }
 
 // NewHealthCheckServiceClient constructs a client for the
@@ -82,13 +93,20 @@ func NewHealthCheckServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(healthCheckServiceMethods.ByName("UploadHealthCheckResult")),
 			connect.WithClientOptions(opts...),
 		),
+		importMynaPortalHealthCheck: connect.NewClient[healthcheck.ImportMynaPortalHealthCheckRequest, healthcheck.ImportMynaPortalHealthCheckResponse](
+			httpClient,
+			baseURL+HealthCheckServiceImportMynaPortalHealthCheckProcedure,
+			connect.WithSchema(healthCheckServiceMethods.ByName("ImportMynaPortalHealthCheck")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // healthCheckServiceClient implements HealthCheckServiceClient.
 type healthCheckServiceClient struct {
-	predictHealthCheck      *connect.Client[healthcheck.HealthCheckPredictionRequest, healthcheck.HealthCheckPredictionResponse]
-	uploadHealthCheckResult *connect.Client[healthcheck.UploadHealthCheckResultRequest, healthcheck.UploadHealthCheckResultResponse]
+	predictHealthCheck          *connect.Client[healthcheck.HealthCheckPredictionRequest, healthcheck.HealthCheckPredictionResponse]
+	uploadHealthCheckResult     *connect.Client[healthcheck.UploadHealthCheckResultRequest, healthcheck.UploadHealthCheckResultResponse]
+	importMynaPortalHealthCheck *connect.Client[healthcheck.ImportMynaPortalHealthCheckRequest, healthcheck.ImportMynaPortalHealthCheckResponse]
 }
 
 // PredictHealthCheck calls taomics.praman.healthcheck.HealthCheckService.PredictHealthCheck.
@@ -100,6 +118,12 @@ func (c *healthCheckServiceClient) PredictHealthCheck(ctx context.Context, req *
 // taomics.praman.healthcheck.HealthCheckService.UploadHealthCheckResult.
 func (c *healthCheckServiceClient) UploadHealthCheckResult(ctx context.Context, req *connect.Request[healthcheck.UploadHealthCheckResultRequest]) (*connect.Response[healthcheck.UploadHealthCheckResultResponse], error) {
 	return c.uploadHealthCheckResult.CallUnary(ctx, req)
+}
+
+// ImportMynaPortalHealthCheck calls
+// taomics.praman.healthcheck.HealthCheckService.ImportMynaPortalHealthCheck.
+func (c *healthCheckServiceClient) ImportMynaPortalHealthCheck(ctx context.Context, req *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error) {
+	return c.importMynaPortalHealthCheck.CallUnary(ctx, req)
 }
 
 // HealthCheckServiceHandler is an implementation of the
@@ -115,8 +139,16 @@ type HealthCheckServiceHandler interface {
 	// Errors:
 	//   - INVALID_ARGUMENT (3): The upload data is invalid.
 	//   - FAILED_PRECONDITION (9): The upload data is not acceptable.
-	//   - ALREADY_EXISTS (6): The health check data is already exists.
+	//   - ALREADY_EXISTS (6): The health check data already exists.
 	UploadHealthCheckResult(context.Context, *connect.Request[healthcheck.UploadHealthCheckResultRequest]) (*connect.Response[healthcheck.UploadHealthCheckResultResponse], error)
+	// Import health check results from Myna Portal API.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): code or redirect_uri is invalid, empty, or expired.
+	//   - FAILED_PRECONDITION (9): User profile (e.g. birthdate or sex) does not match Myna Portal
+	//     record.
+	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
+	ImportMynaPortalHealthCheck(context.Context, *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error)
 }
 
 // NewHealthCheckServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -138,12 +170,20 @@ func NewHealthCheckServiceHandler(svc HealthCheckServiceHandler, opts ...connect
 		connect.WithSchema(healthCheckServiceMethods.ByName("UploadHealthCheckResult")),
 		connect.WithHandlerOptions(opts...),
 	)
+	healthCheckServiceImportMynaPortalHealthCheckHandler := connect.NewUnaryHandler(
+		HealthCheckServiceImportMynaPortalHealthCheckProcedure,
+		svc.ImportMynaPortalHealthCheck,
+		connect.WithSchema(healthCheckServiceMethods.ByName("ImportMynaPortalHealthCheck")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/taomics.praman.healthcheck.HealthCheckService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case HealthCheckServicePredictHealthCheckProcedure:
 			healthCheckServicePredictHealthCheckHandler.ServeHTTP(w, r)
 		case HealthCheckServiceUploadHealthCheckResultProcedure:
 			healthCheckServiceUploadHealthCheckResultHandler.ServeHTTP(w, r)
+		case HealthCheckServiceImportMynaPortalHealthCheckProcedure:
+			healthCheckServiceImportMynaPortalHealthCheckHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -159,4 +199,8 @@ func (UnimplementedHealthCheckServiceHandler) PredictHealthCheck(context.Context
 
 func (UnimplementedHealthCheckServiceHandler) UploadHealthCheckResult(context.Context, *connect.Request[healthcheck.UploadHealthCheckResultRequest]) (*connect.Response[healthcheck.UploadHealthCheckResultResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthcheck.HealthCheckService.UploadHealthCheckResult is not implemented"))
+}
+
+func (UnimplementedHealthCheckServiceHandler) ImportMynaPortalHealthCheck(context.Context, *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthcheck.HealthCheckService.ImportMynaPortalHealthCheck is not implemented"))
 }

@@ -210,7 +210,7 @@ type HealthCheckUploadData struct {
 	unknownFields protoimpl.UnknownFields
 
 	Issuer     string                          `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`                           // 医療機関名
-	IssuerCode string                          `protobuf:"bytes,2,opt,name=issuer_code,json=issuerCode,proto3" json:"issuer_code,omitempty"` // 処方箋発行医療機関コード
+	IssuerCode string                          `protobuf:"bytes,2,opt,name=issuer_code,json=issuerCode,proto3" json:"issuer_code,omitempty"` // 保険医療機関番号（処方箋発行機関コード）
 	IssueDate  *pramanapi.Date                 `protobuf:"bytes,3,opt,name=issue_date,json=issueDate,proto3" json:"issue_date,omitempty"`    // QRコード発行日
 	Results    []*HealthCheckUploadData_Result `protobuf:"bytes,4,rep,name=results,proto3" json:"results,omitempty"`                         // 健康診断結果
 }
@@ -467,6 +467,120 @@ func (*UploadHealthCheckResultResponse) Descriptor() ([]byte, []int) {
 	return file_healthcheck_healthcheck_proto_rawDescGZIP(), []int{5}
 }
 
+type ImportMynaPortalHealthCheckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// OAuth authorization code used to exchange for an access token.
+	Code string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	// OAuth redirect_uri used to exchange for an access token.
+	RedirectUri string `protobuf:"bytes,2,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
+}
+
+func (x *ImportMynaPortalHealthCheckRequest) Reset() {
+	*x = ImportMynaPortalHealthCheckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_healthcheck_healthcheck_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ImportMynaPortalHealthCheckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportMynaPortalHealthCheckRequest) ProtoMessage() {}
+
+func (x *ImportMynaPortalHealthCheckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_healthcheck_healthcheck_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportMynaPortalHealthCheckRequest.ProtoReflect.Descriptor instead.
+func (*ImportMynaPortalHealthCheckRequest) Descriptor() ([]byte, []int) {
+	return file_healthcheck_healthcheck_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ImportMynaPortalHealthCheckRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *ImportMynaPortalHealthCheckRequest) GetRedirectUri() string {
+	if x != nil {
+		return x.RedirectUri
+	}
+	return ""
+}
+
+type ImportMynaPortalHealthCheckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// List of imported dates.
+	ImportedDates []*pramanapi.Date `protobuf:"bytes,1,rep,name=imported_dates,json=importedDates,proto3" json:"imported_dates,omitempty"`
+	// Count of skipped dates that already exist.
+	AlreadyExistsCount int32 `protobuf:"varint,2,opt,name=already_exists_count,json=alreadyExistsCount,proto3" json:"already_exists_count,omitempty"`
+}
+
+func (x *ImportMynaPortalHealthCheckResponse) Reset() {
+	*x = ImportMynaPortalHealthCheckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_healthcheck_healthcheck_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ImportMynaPortalHealthCheckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportMynaPortalHealthCheckResponse) ProtoMessage() {}
+
+func (x *ImportMynaPortalHealthCheckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_healthcheck_healthcheck_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportMynaPortalHealthCheckResponse.ProtoReflect.Descriptor instead.
+func (*ImportMynaPortalHealthCheckResponse) Descriptor() ([]byte, []int) {
+	return file_healthcheck_healthcheck_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ImportMynaPortalHealthCheckResponse) GetImportedDates() []*pramanapi.Date {
+	if x != nil {
+		return x.ImportedDates
+	}
+	return nil
+}
+
+func (x *ImportMynaPortalHealthCheckResponse) GetAlreadyExistsCount() int32 {
+	if x != nil {
+		return x.AlreadyExistsCount
+	}
+	return 0
+}
+
 type HealthCheckParameter_Recommendation struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -479,7 +593,7 @@ type HealthCheckParameter_Recommendation struct {
 func (x *HealthCheckParameter_Recommendation) Reset() {
 	*x = HealthCheckParameter_Recommendation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_healthcheck_healthcheck_proto_msgTypes[6]
+		mi := &file_healthcheck_healthcheck_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -492,7 +606,7 @@ func (x *HealthCheckParameter_Recommendation) String() string {
 func (*HealthCheckParameter_Recommendation) ProtoMessage() {}
 
 func (x *HealthCheckParameter_Recommendation) ProtoReflect() protoreflect.Message {
-	mi := &file_healthcheck_healthcheck_proto_msgTypes[6]
+	mi := &file_healthcheck_healthcheck_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -534,7 +648,7 @@ type HealthCheckParameter_ReferenceRange struct {
 func (x *HealthCheckParameter_ReferenceRange) Reset() {
 	*x = HealthCheckParameter_ReferenceRange{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_healthcheck_healthcheck_proto_msgTypes[7]
+		mi := &file_healthcheck_healthcheck_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -547,7 +661,7 @@ func (x *HealthCheckParameter_ReferenceRange) String() string {
 func (*HealthCheckParameter_ReferenceRange) ProtoMessage() {}
 
 func (x *HealthCheckParameter_ReferenceRange) ProtoReflect() protoreflect.Message {
-	mi := &file_healthcheck_healthcheck_proto_msgTypes[7]
+	mi := &file_healthcheck_healthcheck_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -582,7 +696,7 @@ type HealthCheckUploadData_Result struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date *pramanapi.Date `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"` // 健康診断受信日
+	Date *pramanapi.Date `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"` // 健康診断受診日
 	Ver  string          `protobuf:"bytes,2,opt,name=ver,proto3" json:"ver,omitempty"`   // 健康診断データバージョン
 	Data string          `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"` // 健康診断データ
 }
@@ -590,7 +704,7 @@ type HealthCheckUploadData_Result struct {
 func (x *HealthCheckUploadData_Result) Reset() {
 	*x = HealthCheckUploadData_Result{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_healthcheck_healthcheck_proto_msgTypes[8]
+		mi := &file_healthcheck_healthcheck_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -603,7 +717,7 @@ func (x *HealthCheckUploadData_Result) String() string {
 func (*HealthCheckUploadData_Result) ProtoMessage() {}
 
 func (x *HealthCheckUploadData_Result) ProtoReflect() protoreflect.Message {
-	mi := &file_healthcheck_healthcheck_proto_msgTypes[8]
+	mi := &file_healthcheck_healthcheck_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -748,30 +862,55 @@ var file_healthcheck_healthcheck_proto_rawDesc = []byte{
 	0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x44, 0x61, 0x74,
 	0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x21, 0x0a, 0x1f, 0x55, 0x70, 0x6c, 0x6f, 0x61,
 	0x64, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75,
-	0x6c, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb5, 0x02, 0x0a, 0x12, 0x48,
-	0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x12, 0x89, 0x01, 0x0a, 0x12, 0x50, 0x72, 0x65, 0x64, 0x69, 0x63, 0x74, 0x48, 0x65, 0x61,
-	0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12, 0x38, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69,
-	0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68,
-	0x63, 0x68, 0x65, 0x63, 0x6b, 0x2e, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63,
-	0x6b, 0x50, 0x72, 0x65, 0x64, 0x69, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x39, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61,
-	0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x2e,
-	0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x72, 0x65, 0x64, 0x69,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x92, 0x01,
-	0x0a, 0x17, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68,
-	0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x3a, 0x2e, 0x74, 0x61, 0x6f, 0x6d,
+	0x6c, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x5b, 0x0a, 0x22, 0x49, 0x6d,
+	0x70, 0x6f, 0x72, 0x74, 0x4d, 0x79, 0x6e, 0x61, 0x50, 0x6f, 0x72, 0x74, 0x61, 0x6c, 0x48, 0x65,
+	0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x63, 0x6f, 0x64, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x72, 0x65, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74,
+	0x5f, 0x75, 0x72, 0x69, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x72, 0x65, 0x64, 0x69,
+	0x72, 0x65, 0x63, 0x74, 0x55, 0x72, 0x69, 0x22, 0x94, 0x01, 0x0a, 0x23, 0x49, 0x6d, 0x70, 0x6f,
+	0x72, 0x74, 0x4d, 0x79, 0x6e, 0x61, 0x50, 0x6f, 0x72, 0x74, 0x61, 0x6c, 0x48, 0x65, 0x61, 0x6c,
+	0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x3b, 0x0a, 0x0e, 0x69, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x5f, 0x64, 0x61, 0x74, 0x65,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63,
+	0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x44, 0x61, 0x74, 0x65, 0x52, 0x0d, 0x69,
+	0x6d, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x44, 0x61, 0x74, 0x65, 0x73, 0x12, 0x30, 0x0a, 0x14,
+	0x61, 0x6c, 0x72, 0x65, 0x61, 0x64, 0x79, 0x5f, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x5f, 0x63,
+	0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x12, 0x61, 0x6c, 0x72, 0x65,
+	0x61, 0x64, 0x79, 0x45, 0x78, 0x69, 0x73, 0x74, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x32, 0xd6,
+	0x03, 0x0a, 0x12, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x53, 0x65,
+	0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x89, 0x01, 0x0a, 0x12, 0x50, 0x72, 0x65, 0x64, 0x69, 0x63,
+	0x74, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12, 0x38, 0x2e, 0x74,
+	0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65,
+	0x61, 0x6c, 0x74, 0x68, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x2e, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68,
+	0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x72, 0x65, 0x64, 0x69, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x39, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73,
+	0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68,
+	0x65, 0x63, 0x6b, 0x2e, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50,
+	0x72, 0x65, 0x64, 0x69, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x92, 0x01, 0x0a, 0x17, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x48, 0x65, 0x61, 0x6c,
+	0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x3a, 0x2e,
+	0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68,
+	0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61,
+	0x64, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75,
+	0x6c, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x3b, 0x2e, 0x74, 0x61, 0x6f, 0x6d,
 	0x69, 0x63, 0x73, 0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74,
 	0x68, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x48, 0x65, 0x61,
 	0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x3b, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2e,
-	0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68, 0x65,
-	0x63, 0x6b, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43,
-	0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x42, 0x2a, 0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2f, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x61,
-	0x70, 0x69, 0x2f, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x9e, 0x01, 0x0a, 0x1b, 0x49, 0x6d, 0x70, 0x6f, 0x72,
+	0x74, 0x4d, 0x79, 0x6e, 0x61, 0x50, 0x6f, 0x72, 0x74, 0x61, 0x6c, 0x48, 0x65, 0x61, 0x6c, 0x74,
+	0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12, 0x3e, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73,
+	0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68,
+	0x65, 0x63, 0x6b, 0x2e, 0x49, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x4d, 0x79, 0x6e, 0x61, 0x50, 0x6f,
+	0x72, 0x74, 0x61, 0x6c, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x3f, 0x2e, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73,
+	0x2e, 0x70, 0x72, 0x61, 0x6d, 0x61, 0x6e, 0x2e, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68,
+	0x65, 0x63, 0x6b, 0x2e, 0x49, 0x6d, 0x70, 0x6f, 0x72, 0x74, 0x4d, 0x79, 0x6e, 0x61, 0x50, 0x6f,
+	0x72, 0x74, 0x61, 0x6c, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x2a, 0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x61, 0x6f, 0x6d, 0x69, 0x63, 0x73, 0x2f, 0x70, 0x72,
+	0x61, 0x6d, 0x61, 0x6e, 0x61, 0x70, 0x69, 0x2f, 0x68, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x63, 0x68,
+	0x65, 0x63, 0x6b, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -787,7 +926,7 @@ func file_healthcheck_healthcheck_proto_rawDescGZIP() []byte {
 }
 
 var file_healthcheck_healthcheck_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_healthcheck_healthcheck_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_healthcheck_healthcheck_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_healthcheck_healthcheck_proto_goTypes = []any{
 	(HealthCheckParameter_HealthRisk)(0),        // 0: taomics.praman.healthcheck.HealthCheckParameter.HealthRisk
 	(*HealthCheckParameter)(nil),                // 1: taomics.praman.healthcheck.HealthCheckParameter
@@ -796,34 +935,39 @@ var file_healthcheck_healthcheck_proto_goTypes = []any{
 	(*HealthCheckPredictionResponse)(nil),       // 4: taomics.praman.healthcheck.HealthCheckPredictionResponse
 	(*UploadHealthCheckResultRequest)(nil),      // 5: taomics.praman.healthcheck.UploadHealthCheckResultRequest
 	(*UploadHealthCheckResultResponse)(nil),     // 6: taomics.praman.healthcheck.UploadHealthCheckResultResponse
-	(*HealthCheckParameter_Recommendation)(nil), // 7: taomics.praman.healthcheck.HealthCheckParameter.Recommendation
-	(*HealthCheckParameter_ReferenceRange)(nil), // 8: taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange
-	(*HealthCheckUploadData_Result)(nil),        // 9: taomics.praman.healthcheck.HealthCheckUploadData.Result
-	(*pramanapi.Date)(nil),                      // 10: taomics.praman.Date
-	(*pramanapi.Range)(nil),                     // 11: taomics.praman.Range
+	(*ImportMynaPortalHealthCheckRequest)(nil),  // 7: taomics.praman.healthcheck.ImportMynaPortalHealthCheckRequest
+	(*ImportMynaPortalHealthCheckResponse)(nil), // 8: taomics.praman.healthcheck.ImportMynaPortalHealthCheckResponse
+	(*HealthCheckParameter_Recommendation)(nil), // 9: taomics.praman.healthcheck.HealthCheckParameter.Recommendation
+	(*HealthCheckParameter_ReferenceRange)(nil), // 10: taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange
+	(*HealthCheckUploadData_Result)(nil),        // 11: taomics.praman.healthcheck.HealthCheckUploadData.Result
+	(*pramanapi.Date)(nil),                      // 12: taomics.praman.Date
+	(*pramanapi.Range)(nil),                     // 13: taomics.praman.Range
 }
 var file_healthcheck_healthcheck_proto_depIdxs = []int32{
 	0,  // 0: taomics.praman.healthcheck.HealthCheckParameter.risk:type_name -> taomics.praman.healthcheck.HealthCheckParameter.HealthRisk
-	7,  // 1: taomics.praman.healthcheck.HealthCheckParameter.recommendations:type_name -> taomics.praman.healthcheck.HealthCheckParameter.Recommendation
-	8,  // 2: taomics.praman.healthcheck.HealthCheckParameter.reference_ranges:type_name -> taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange
-	10, // 3: taomics.praman.healthcheck.HealthCheckUploadData.issue_date:type_name -> taomics.praman.Date
-	9,  // 4: taomics.praman.healthcheck.HealthCheckUploadData.results:type_name -> taomics.praman.healthcheck.HealthCheckUploadData.Result
-	10, // 5: taomics.praman.healthcheck.HealthCheckPredictionRequest.date:type_name -> taomics.praman.Date
-	10, // 6: taomics.praman.healthcheck.HealthCheckPredictionResponse.date:type_name -> taomics.praman.Date
+	9,  // 1: taomics.praman.healthcheck.HealthCheckParameter.recommendations:type_name -> taomics.praman.healthcheck.HealthCheckParameter.Recommendation
+	10, // 2: taomics.praman.healthcheck.HealthCheckParameter.reference_ranges:type_name -> taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange
+	12, // 3: taomics.praman.healthcheck.HealthCheckUploadData.issue_date:type_name -> taomics.praman.Date
+	11, // 4: taomics.praman.healthcheck.HealthCheckUploadData.results:type_name -> taomics.praman.healthcheck.HealthCheckUploadData.Result
+	12, // 5: taomics.praman.healthcheck.HealthCheckPredictionRequest.date:type_name -> taomics.praman.Date
+	12, // 6: taomics.praman.healthcheck.HealthCheckPredictionResponse.date:type_name -> taomics.praman.Date
 	1,  // 7: taomics.praman.healthcheck.HealthCheckPredictionResponse.parameters:type_name -> taomics.praman.healthcheck.HealthCheckParameter
 	2,  // 8: taomics.praman.healthcheck.UploadHealthCheckResultRequest.data:type_name -> taomics.praman.healthcheck.HealthCheckUploadData
-	0,  // 9: taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange.risk:type_name -> taomics.praman.healthcheck.HealthCheckParameter.HealthRisk
-	11, // 10: taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange.range:type_name -> taomics.praman.Range
-	10, // 11: taomics.praman.healthcheck.HealthCheckUploadData.Result.date:type_name -> taomics.praman.Date
-	3,  // 12: taomics.praman.healthcheck.HealthCheckService.PredictHealthCheck:input_type -> taomics.praman.healthcheck.HealthCheckPredictionRequest
-	5,  // 13: taomics.praman.healthcheck.HealthCheckService.UploadHealthCheckResult:input_type -> taomics.praman.healthcheck.UploadHealthCheckResultRequest
-	4,  // 14: taomics.praman.healthcheck.HealthCheckService.PredictHealthCheck:output_type -> taomics.praman.healthcheck.HealthCheckPredictionResponse
-	6,  // 15: taomics.praman.healthcheck.HealthCheckService.UploadHealthCheckResult:output_type -> taomics.praman.healthcheck.UploadHealthCheckResultResponse
-	14, // [14:16] is the sub-list for method output_type
-	12, // [12:14] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	12, // 9: taomics.praman.healthcheck.ImportMynaPortalHealthCheckResponse.imported_dates:type_name -> taomics.praman.Date
+	0,  // 10: taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange.risk:type_name -> taomics.praman.healthcheck.HealthCheckParameter.HealthRisk
+	13, // 11: taomics.praman.healthcheck.HealthCheckParameter.ReferenceRange.range:type_name -> taomics.praman.Range
+	12, // 12: taomics.praman.healthcheck.HealthCheckUploadData.Result.date:type_name -> taomics.praman.Date
+	3,  // 13: taomics.praman.healthcheck.HealthCheckService.PredictHealthCheck:input_type -> taomics.praman.healthcheck.HealthCheckPredictionRequest
+	5,  // 14: taomics.praman.healthcheck.HealthCheckService.UploadHealthCheckResult:input_type -> taomics.praman.healthcheck.UploadHealthCheckResultRequest
+	7,  // 15: taomics.praman.healthcheck.HealthCheckService.ImportMynaPortalHealthCheck:input_type -> taomics.praman.healthcheck.ImportMynaPortalHealthCheckRequest
+	4,  // 16: taomics.praman.healthcheck.HealthCheckService.PredictHealthCheck:output_type -> taomics.praman.healthcheck.HealthCheckPredictionResponse
+	6,  // 17: taomics.praman.healthcheck.HealthCheckService.UploadHealthCheckResult:output_type -> taomics.praman.healthcheck.UploadHealthCheckResultResponse
+	8,  // 18: taomics.praman.healthcheck.HealthCheckService.ImportMynaPortalHealthCheck:output_type -> taomics.praman.healthcheck.ImportMynaPortalHealthCheckResponse
+	16, // [16:19] is the sub-list for method output_type
+	13, // [13:16] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_healthcheck_healthcheck_proto_init() }
@@ -905,7 +1049,7 @@ func file_healthcheck_healthcheck_proto_init() {
 			}
 		}
 		file_healthcheck_healthcheck_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*HealthCheckParameter_Recommendation); i {
+			switch v := v.(*ImportMynaPortalHealthCheckRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -917,7 +1061,7 @@ func file_healthcheck_healthcheck_proto_init() {
 			}
 		}
 		file_healthcheck_healthcheck_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*HealthCheckParameter_ReferenceRange); i {
+			switch v := v.(*ImportMynaPortalHealthCheckResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -929,6 +1073,30 @@ func file_healthcheck_healthcheck_proto_init() {
 			}
 		}
 		file_healthcheck_healthcheck_proto_msgTypes[8].Exporter = func(v any, i int) any {
+			switch v := v.(*HealthCheckParameter_Recommendation); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_healthcheck_healthcheck_proto_msgTypes[9].Exporter = func(v any, i int) any {
+			switch v := v.(*HealthCheckParameter_ReferenceRange); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_healthcheck_healthcheck_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*HealthCheckUploadData_Result); i {
 			case 0:
 				return &v.state
@@ -947,7 +1115,7 @@ func file_healthcheck_healthcheck_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_healthcheck_healthcheck_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
