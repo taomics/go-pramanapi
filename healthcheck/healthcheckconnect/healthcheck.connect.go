@@ -42,6 +42,15 @@ const (
 	// HealthCheckServiceImportMynaPortalHealthCheckProcedure is the fully-qualified name of the
 	// HealthCheckService's ImportMynaPortalHealthCheck RPC.
 	HealthCheckServiceImportMynaPortalHealthCheckProcedure = "/taomics.praman.healthcheck.HealthCheckService/ImportMynaPortalHealthCheck"
+	// HealthCheckServiceListHealthCheckResultsProcedure is the fully-qualified name of the
+	// HealthCheckService's ListHealthCheckResults RPC.
+	HealthCheckServiceListHealthCheckResultsProcedure = "/taomics.praman.healthcheck.HealthCheckService/ListHealthCheckResults"
+	// HealthCheckServiceDownloadHealthCheckResultProcedure is the fully-qualified name of the
+	// HealthCheckService's DownloadHealthCheckResult RPC.
+	HealthCheckServiceDownloadHealthCheckResultProcedure = "/taomics.praman.healthcheck.HealthCheckService/DownloadHealthCheckResult"
+	// HealthCheckServiceDeleteHealthCheckResultProcedure is the fully-qualified name of the
+	// HealthCheckService's DeleteHealthCheckResult RPC.
+	HealthCheckServiceDeleteHealthCheckResultProcedure = "/taomics.praman.healthcheck.HealthCheckService/DeleteHealthCheckResult"
 )
 
 // HealthCheckServiceClient is a client for the taomics.praman.healthcheck.HealthCheckService
@@ -50,6 +59,7 @@ type HealthCheckServiceClient interface {
 	// Predict health check result in the future.
 	//
 	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid.
 	//   - NOT_FOUND (5): The health check data is not found.
 	PredictHealthCheck(context.Context, *connect.Request[healthcheck.HealthCheckPredictionRequest]) (*connect.Response[healthcheck.HealthCheckPredictionResponse], error)
 	// Upload health check result.
@@ -67,6 +77,20 @@ type HealthCheckServiceClient interface {
 	//     record.
 	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
 	ImportMynaPortalHealthCheck(context.Context, *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error)
+	// List imported health check results for the current user.
+	ListHealthCheckResults(context.Context, *connect.Request[healthcheck.ListHealthCheckResultsRequest]) (*connect.Response[healthcheck.ListHealthCheckResultsResponse], error)
+	// Download a health check result as a portable JSON file.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DownloadHealthCheckResult(context.Context, *connect.Request[healthcheck.DownloadHealthCheckResultRequest]) (*connect.Response[healthcheck.DownloadHealthCheckResultResponse], error)
+	// Delete a health check result for the current user.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DeleteHealthCheckResult(context.Context, *connect.Request[healthcheck.DeleteHealthCheckResultRequest]) (*connect.Response[healthcheck.DeleteHealthCheckResultResponse], error)
 }
 
 // NewHealthCheckServiceClient constructs a client for the
@@ -99,6 +123,24 @@ func NewHealthCheckServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(healthCheckServiceMethods.ByName("ImportMynaPortalHealthCheck")),
 			connect.WithClientOptions(opts...),
 		),
+		listHealthCheckResults: connect.NewClient[healthcheck.ListHealthCheckResultsRequest, healthcheck.ListHealthCheckResultsResponse](
+			httpClient,
+			baseURL+HealthCheckServiceListHealthCheckResultsProcedure,
+			connect.WithSchema(healthCheckServiceMethods.ByName("ListHealthCheckResults")),
+			connect.WithClientOptions(opts...),
+		),
+		downloadHealthCheckResult: connect.NewClient[healthcheck.DownloadHealthCheckResultRequest, healthcheck.DownloadHealthCheckResultResponse](
+			httpClient,
+			baseURL+HealthCheckServiceDownloadHealthCheckResultProcedure,
+			connect.WithSchema(healthCheckServiceMethods.ByName("DownloadHealthCheckResult")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteHealthCheckResult: connect.NewClient[healthcheck.DeleteHealthCheckResultRequest, healthcheck.DeleteHealthCheckResultResponse](
+			httpClient,
+			baseURL+HealthCheckServiceDeleteHealthCheckResultProcedure,
+			connect.WithSchema(healthCheckServiceMethods.ByName("DeleteHealthCheckResult")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -107,6 +149,9 @@ type healthCheckServiceClient struct {
 	predictHealthCheck          *connect.Client[healthcheck.HealthCheckPredictionRequest, healthcheck.HealthCheckPredictionResponse]
 	uploadHealthCheckResult     *connect.Client[healthcheck.UploadHealthCheckResultRequest, healthcheck.UploadHealthCheckResultResponse]
 	importMynaPortalHealthCheck *connect.Client[healthcheck.ImportMynaPortalHealthCheckRequest, healthcheck.ImportMynaPortalHealthCheckResponse]
+	listHealthCheckResults      *connect.Client[healthcheck.ListHealthCheckResultsRequest, healthcheck.ListHealthCheckResultsResponse]
+	downloadHealthCheckResult   *connect.Client[healthcheck.DownloadHealthCheckResultRequest, healthcheck.DownloadHealthCheckResultResponse]
+	deleteHealthCheckResult     *connect.Client[healthcheck.DeleteHealthCheckResultRequest, healthcheck.DeleteHealthCheckResultResponse]
 }
 
 // PredictHealthCheck calls taomics.praman.healthcheck.HealthCheckService.PredictHealthCheck.
@@ -126,12 +171,31 @@ func (c *healthCheckServiceClient) ImportMynaPortalHealthCheck(ctx context.Conte
 	return c.importMynaPortalHealthCheck.CallUnary(ctx, req)
 }
 
+// ListHealthCheckResults calls
+// taomics.praman.healthcheck.HealthCheckService.ListHealthCheckResults.
+func (c *healthCheckServiceClient) ListHealthCheckResults(ctx context.Context, req *connect.Request[healthcheck.ListHealthCheckResultsRequest]) (*connect.Response[healthcheck.ListHealthCheckResultsResponse], error) {
+	return c.listHealthCheckResults.CallUnary(ctx, req)
+}
+
+// DownloadHealthCheckResult calls
+// taomics.praman.healthcheck.HealthCheckService.DownloadHealthCheckResult.
+func (c *healthCheckServiceClient) DownloadHealthCheckResult(ctx context.Context, req *connect.Request[healthcheck.DownloadHealthCheckResultRequest]) (*connect.Response[healthcheck.DownloadHealthCheckResultResponse], error) {
+	return c.downloadHealthCheckResult.CallUnary(ctx, req)
+}
+
+// DeleteHealthCheckResult calls
+// taomics.praman.healthcheck.HealthCheckService.DeleteHealthCheckResult.
+func (c *healthCheckServiceClient) DeleteHealthCheckResult(ctx context.Context, req *connect.Request[healthcheck.DeleteHealthCheckResultRequest]) (*connect.Response[healthcheck.DeleteHealthCheckResultResponse], error) {
+	return c.deleteHealthCheckResult.CallUnary(ctx, req)
+}
+
 // HealthCheckServiceHandler is an implementation of the
 // taomics.praman.healthcheck.HealthCheckService service.
 type HealthCheckServiceHandler interface {
 	// Predict health check result in the future.
 	//
 	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid.
 	//   - NOT_FOUND (5): The health check data is not found.
 	PredictHealthCheck(context.Context, *connect.Request[healthcheck.HealthCheckPredictionRequest]) (*connect.Response[healthcheck.HealthCheckPredictionResponse], error)
 	// Upload health check result.
@@ -149,6 +213,20 @@ type HealthCheckServiceHandler interface {
 	//     record.
 	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
 	ImportMynaPortalHealthCheck(context.Context, *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error)
+	// List imported health check results for the current user.
+	ListHealthCheckResults(context.Context, *connect.Request[healthcheck.ListHealthCheckResultsRequest]) (*connect.Response[healthcheck.ListHealthCheckResultsResponse], error)
+	// Download a health check result as a portable JSON file.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DownloadHealthCheckResult(context.Context, *connect.Request[healthcheck.DownloadHealthCheckResultRequest]) (*connect.Response[healthcheck.DownloadHealthCheckResultResponse], error)
+	// Delete a health check result for the current user.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DeleteHealthCheckResult(context.Context, *connect.Request[healthcheck.DeleteHealthCheckResultRequest]) (*connect.Response[healthcheck.DeleteHealthCheckResultResponse], error)
 }
 
 // NewHealthCheckServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -176,6 +254,24 @@ func NewHealthCheckServiceHandler(svc HealthCheckServiceHandler, opts ...connect
 		connect.WithSchema(healthCheckServiceMethods.ByName("ImportMynaPortalHealthCheck")),
 		connect.WithHandlerOptions(opts...),
 	)
+	healthCheckServiceListHealthCheckResultsHandler := connect.NewUnaryHandler(
+		HealthCheckServiceListHealthCheckResultsProcedure,
+		svc.ListHealthCheckResults,
+		connect.WithSchema(healthCheckServiceMethods.ByName("ListHealthCheckResults")),
+		connect.WithHandlerOptions(opts...),
+	)
+	healthCheckServiceDownloadHealthCheckResultHandler := connect.NewUnaryHandler(
+		HealthCheckServiceDownloadHealthCheckResultProcedure,
+		svc.DownloadHealthCheckResult,
+		connect.WithSchema(healthCheckServiceMethods.ByName("DownloadHealthCheckResult")),
+		connect.WithHandlerOptions(opts...),
+	)
+	healthCheckServiceDeleteHealthCheckResultHandler := connect.NewUnaryHandler(
+		HealthCheckServiceDeleteHealthCheckResultProcedure,
+		svc.DeleteHealthCheckResult,
+		connect.WithSchema(healthCheckServiceMethods.ByName("DeleteHealthCheckResult")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/taomics.praman.healthcheck.HealthCheckService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case HealthCheckServicePredictHealthCheckProcedure:
@@ -184,6 +280,12 @@ func NewHealthCheckServiceHandler(svc HealthCheckServiceHandler, opts ...connect
 			healthCheckServiceUploadHealthCheckResultHandler.ServeHTTP(w, r)
 		case HealthCheckServiceImportMynaPortalHealthCheckProcedure:
 			healthCheckServiceImportMynaPortalHealthCheckHandler.ServeHTTP(w, r)
+		case HealthCheckServiceListHealthCheckResultsProcedure:
+			healthCheckServiceListHealthCheckResultsHandler.ServeHTTP(w, r)
+		case HealthCheckServiceDownloadHealthCheckResultProcedure:
+			healthCheckServiceDownloadHealthCheckResultHandler.ServeHTTP(w, r)
+		case HealthCheckServiceDeleteHealthCheckResultProcedure:
+			healthCheckServiceDeleteHealthCheckResultHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -203,4 +305,16 @@ func (UnimplementedHealthCheckServiceHandler) UploadHealthCheckResult(context.Co
 
 func (UnimplementedHealthCheckServiceHandler) ImportMynaPortalHealthCheck(context.Context, *connect.Request[healthcheck.ImportMynaPortalHealthCheckRequest]) (*connect.Response[healthcheck.ImportMynaPortalHealthCheckResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthcheck.HealthCheckService.ImportMynaPortalHealthCheck is not implemented"))
+}
+
+func (UnimplementedHealthCheckServiceHandler) ListHealthCheckResults(context.Context, *connect.Request[healthcheck.ListHealthCheckResultsRequest]) (*connect.Response[healthcheck.ListHealthCheckResultsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthcheck.HealthCheckService.ListHealthCheckResults is not implemented"))
+}
+
+func (UnimplementedHealthCheckServiceHandler) DownloadHealthCheckResult(context.Context, *connect.Request[healthcheck.DownloadHealthCheckResultRequest]) (*connect.Response[healthcheck.DownloadHealthCheckResultResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthcheck.HealthCheckService.DownloadHealthCheckResult is not implemented"))
+}
+
+func (UnimplementedHealthCheckServiceHandler) DeleteHealthCheckResult(context.Context, *connect.Request[healthcheck.DeleteHealthCheckResultRequest]) (*connect.Response[healthcheck.DeleteHealthCheckResultResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("taomics.praman.healthcheck.HealthCheckService.DeleteHealthCheckResult is not implemented"))
 }

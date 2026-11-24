@@ -22,6 +22,9 @@ const (
 	HealthCheckService_PredictHealthCheck_FullMethodName          = "/taomics.praman.healthcheck.HealthCheckService/PredictHealthCheck"
 	HealthCheckService_UploadHealthCheckResult_FullMethodName     = "/taomics.praman.healthcheck.HealthCheckService/UploadHealthCheckResult"
 	HealthCheckService_ImportMynaPortalHealthCheck_FullMethodName = "/taomics.praman.healthcheck.HealthCheckService/ImportMynaPortalHealthCheck"
+	HealthCheckService_ListHealthCheckResults_FullMethodName      = "/taomics.praman.healthcheck.HealthCheckService/ListHealthCheckResults"
+	HealthCheckService_DownloadHealthCheckResult_FullMethodName   = "/taomics.praman.healthcheck.HealthCheckService/DownloadHealthCheckResult"
+	HealthCheckService_DeleteHealthCheckResult_FullMethodName     = "/taomics.praman.healthcheck.HealthCheckService/DeleteHealthCheckResult"
 )
 
 // HealthCheckServiceClient is the client API for HealthCheckService service.
@@ -38,6 +41,7 @@ type HealthCheckServiceClient interface {
 	// Predict health check result in the future.
 	//
 	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid.
 	//   - NOT_FOUND (5): The health check data is not found.
 	PredictHealthCheck(ctx context.Context, in *HealthCheckPredictionRequest, opts ...grpc.CallOption) (*HealthCheckPredictionResponse, error)
 	// Upload health check result.
@@ -55,6 +59,20 @@ type HealthCheckServiceClient interface {
 	//     record.
 	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
 	ImportMynaPortalHealthCheck(ctx context.Context, in *ImportMynaPortalHealthCheckRequest, opts ...grpc.CallOption) (*ImportMynaPortalHealthCheckResponse, error)
+	// List imported health check results for the current user.
+	ListHealthCheckResults(ctx context.Context, in *ListHealthCheckResultsRequest, opts ...grpc.CallOption) (*ListHealthCheckResultsResponse, error)
+	// Download a health check result as a portable JSON file.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DownloadHealthCheckResult(ctx context.Context, in *DownloadHealthCheckResultRequest, opts ...grpc.CallOption) (*DownloadHealthCheckResultResponse, error)
+	// Delete a health check result for the current user.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DeleteHealthCheckResult(ctx context.Context, in *DeleteHealthCheckResultRequest, opts ...grpc.CallOption) (*DeleteHealthCheckResultResponse, error)
 }
 
 type healthCheckServiceClient struct {
@@ -95,6 +113,36 @@ func (c *healthCheckServiceClient) ImportMynaPortalHealthCheck(ctx context.Conte
 	return out, nil
 }
 
+func (c *healthCheckServiceClient) ListHealthCheckResults(ctx context.Context, in *ListHealthCheckResultsRequest, opts ...grpc.CallOption) (*ListHealthCheckResultsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListHealthCheckResultsResponse)
+	err := c.cc.Invoke(ctx, HealthCheckService_ListHealthCheckResults_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *healthCheckServiceClient) DownloadHealthCheckResult(ctx context.Context, in *DownloadHealthCheckResultRequest, opts ...grpc.CallOption) (*DownloadHealthCheckResultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DownloadHealthCheckResultResponse)
+	err := c.cc.Invoke(ctx, HealthCheckService_DownloadHealthCheckResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *healthCheckServiceClient) DeleteHealthCheckResult(ctx context.Context, in *DeleteHealthCheckResultRequest, opts ...grpc.CallOption) (*DeleteHealthCheckResultResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteHealthCheckResultResponse)
+	err := c.cc.Invoke(ctx, HealthCheckService_DeleteHealthCheckResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HealthCheckServiceServer is the server API for HealthCheckService service.
 // All implementations must embed UnimplementedHealthCheckServiceServer
 // for forward compatibility.
@@ -109,6 +157,7 @@ type HealthCheckServiceServer interface {
 	// Predict health check result in the future.
 	//
 	// Errors:
+	//   - INVALID_ARGUMENT (3): id is invalid.
 	//   - NOT_FOUND (5): The health check data is not found.
 	PredictHealthCheck(context.Context, *HealthCheckPredictionRequest) (*HealthCheckPredictionResponse, error)
 	// Upload health check result.
@@ -126,6 +175,20 @@ type HealthCheckServiceServer interface {
 	//     record.
 	//   - UNAVAILABLE (14): Myna Portal API is temporarily unavailable (e.g. maintenance or timeout).
 	ImportMynaPortalHealthCheck(context.Context, *ImportMynaPortalHealthCheckRequest) (*ImportMynaPortalHealthCheckResponse, error)
+	// List imported health check results for the current user.
+	ListHealthCheckResults(context.Context, *ListHealthCheckResultsRequest) (*ListHealthCheckResultsResponse, error)
+	// Download a health check result as a portable JSON file.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DownloadHealthCheckResult(context.Context, *DownloadHealthCheckResultRequest) (*DownloadHealthCheckResultResponse, error)
+	// Delete a health check result for the current user.
+	//
+	// Errors:
+	//   - INVALID_ARGUMENT (3): id is empty or invalid.
+	//   - NOT_FOUND (5): The health check result is not found.
+	DeleteHealthCheckResult(context.Context, *DeleteHealthCheckResultRequest) (*DeleteHealthCheckResultResponse, error)
 	mustEmbedUnimplementedHealthCheckServiceServer()
 }
 
@@ -144,6 +207,15 @@ func (UnimplementedHealthCheckServiceServer) UploadHealthCheckResult(context.Con
 }
 func (UnimplementedHealthCheckServiceServer) ImportMynaPortalHealthCheck(context.Context, *ImportMynaPortalHealthCheckRequest) (*ImportMynaPortalHealthCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ImportMynaPortalHealthCheck not implemented")
+}
+func (UnimplementedHealthCheckServiceServer) ListHealthCheckResults(context.Context, *ListHealthCheckResultsRequest) (*ListHealthCheckResultsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListHealthCheckResults not implemented")
+}
+func (UnimplementedHealthCheckServiceServer) DownloadHealthCheckResult(context.Context, *DownloadHealthCheckResultRequest) (*DownloadHealthCheckResultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownloadHealthCheckResult not implemented")
+}
+func (UnimplementedHealthCheckServiceServer) DeleteHealthCheckResult(context.Context, *DeleteHealthCheckResultRequest) (*DeleteHealthCheckResultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteHealthCheckResult not implemented")
 }
 func (UnimplementedHealthCheckServiceServer) mustEmbedUnimplementedHealthCheckServiceServer() {}
 func (UnimplementedHealthCheckServiceServer) testEmbeddedByValue()                            {}
@@ -220,6 +292,60 @@ func _HealthCheckService_ImportMynaPortalHealthCheck_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HealthCheckService_ListHealthCheckResults_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListHealthCheckResultsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthCheckServiceServer).ListHealthCheckResults(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthCheckService_ListHealthCheckResults_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthCheckServiceServer).ListHealthCheckResults(ctx, req.(*ListHealthCheckResultsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HealthCheckService_DownloadHealthCheckResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DownloadHealthCheckResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthCheckServiceServer).DownloadHealthCheckResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthCheckService_DownloadHealthCheckResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthCheckServiceServer).DownloadHealthCheckResult(ctx, req.(*DownloadHealthCheckResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HealthCheckService_DeleteHealthCheckResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteHealthCheckResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthCheckServiceServer).DeleteHealthCheckResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HealthCheckService_DeleteHealthCheckResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthCheckServiceServer).DeleteHealthCheckResult(ctx, req.(*DeleteHealthCheckResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HealthCheckService_ServiceDesc is the grpc.ServiceDesc for HealthCheckService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -238,6 +364,18 @@ var HealthCheckService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ImportMynaPortalHealthCheck",
 			Handler:    _HealthCheckService_ImportMynaPortalHealthCheck_Handler,
+		},
+		{
+			MethodName: "ListHealthCheckResults",
+			Handler:    _HealthCheckService_ListHealthCheckResults_Handler,
+		},
+		{
+			MethodName: "DownloadHealthCheckResult",
+			Handler:    _HealthCheckService_DownloadHealthCheckResult_Handler,
+		},
+		{
+			MethodName: "DeleteHealthCheckResult",
+			Handler:    _HealthCheckService_DeleteHealthCheckResult_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
